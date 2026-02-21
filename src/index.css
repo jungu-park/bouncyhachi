@@ -1,0 +1,48 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-display: "Inter", sans-serif;
+  --color-primary: #067ff9;
+  --color-neon-pink: #ff2e88;
+  --color-background-light: #f5f7f8;
+  --color-background-dark: #0f1923;
+}
+
+@layer components {
+  .neon-pink-glow {
+    box-shadow: 0 0 15px rgba(255, 46, 136, 0.4);
+  }
+
+  .neon-blue-glow {
+    box-shadow: 0 0 15px rgba(6, 127, 249, 0.3);
+  }
+
+  .glass-effect {
+    backdrop-filter: blur(8px);
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+
+  .sidebar-item-active {
+    background-color: rgba(6, 127, 249, 0.1);
+    border-left: 4px solid var(--color-primary);
+  }
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-display);
+  background-color: var(--color-background-light);
+  color: #0f172a;
+  /* slate-900 */
+  min-height: 100vh;
+}
+
+html.dark body {
+  background-color: var(--color-background-dark);
+  color: #f1f5f9;
+  /* slate-100 */
+}

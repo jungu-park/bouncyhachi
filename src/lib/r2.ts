@@ -1,0 +1,46 @@
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import imageCompression from 'browser-image-compression';
+
+const accountId = import.meta.env.VITE_R2_ACCOUNT_ID || import.meta.env.NEXT_PUBLIC_R2_ACCOUNT_ID;
+const accessKeyId = import.meta.env.VITE_R2_ACCESS_KEY_ID || import.meta.env.NEXT_PUBLIC_R2_ACCESS_KEY_ID;
+const secretAccessKey = import.meta.env.VITE_R2_SECRET_ACCESS_KEY || import.meta.env.NEXT_PUBLIC_R2_SECRET_ACCESS_KEY;
+export const r2Bucket = import.meta.env.VITE_R2_BUCKET || import.meta.env.NEXT_PUBLIC_R2_BUCKET;
+export const r2PublicUrl = import.meta.env.VITE_R2_PUBLIC_URL || import.meta.env.NEXT_PUBLIC_R2_PUBLIC_URL;
+
+export const s3Client = new S3Client({
+    region: 'auto',
+    endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
+    credentials: {
+        accessKeyId: accessKeyId,
+        secretAccessKey: secretAccessKey,
+    },
+});
+
+export const compressAndUploadImage = async (file: File): Promise<string> => {
+    try {
+        const options = {
+            maxSizeMB: 1, // Compress to max 1MB
+            maxWidthOrHeight: 1200,
+            useWebWorker: true,
+        };
+
+        const compressedFile = await imageCompression(file, options);
+        const fileExtension = compressedFile.name.split('.').pop() || 'jpg';
+        const fileName = `uploads/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExtension}`;
+
+        const command = new PutObjectCommand({
+            Bucket: r2Bucket,
+            Key: fileName,
+            Body: compressedFile,
+            ContentType: compressedFile.type,
+        });
+
+        await s3Client.send(command);
+
+        // Return the public URL for the uploaded image
+        return `${r2PublicUrl}/${fileName}`;
+    } catch (error) {
+        console.error('Error compressing/uploading image to R2:', error);
+        throw error;
+    }
+};

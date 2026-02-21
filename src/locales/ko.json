@@ -1,0 +1,36 @@
+{
+    "nav": {
+        "home": "홈",
+        "blog": "바이브 로그",
+        "tools": "바이브 툴즈",
+        "games": "바운시 게임즈",
+        "fortune": "바이브 운세",
+        "admin": "관리자"
+    },
+    "home": {
+        "title": "BouncyHachi에 오신 것을 환영합니다",
+        "subtitle": "코딩 바이브, 도구, 그리고 즐거움이 가득한 포털에 빠져보세요.",
+        "explore": "지금 탐험하기"
+    },
+    "cards": {
+        "blog": {
+            "title": "바이브 로그",
+            "desc": "오랫동안 간직할 수 있는 콘텐츠와 코딩 분위기."
+        },
+        "tools": {
+            "title": "바이브 툴즈",
+            "desc": "심플한 유틸리티 웹 앱 모음."
+        },
+        "games": {
+            "title": "바운시 게임즈",
+            "desc": "웹 기반 아케이드 게임."
+        },
+        "fortune": {
+            "title": "바이브 운세",
+            "desc": "AI 인터랙티브 심리테스트 및 타로."
+        }
+    },
+    "footer": {
+        "copyright": "© 2026 BouncyHachi. All rights reserved."
+    }
+}

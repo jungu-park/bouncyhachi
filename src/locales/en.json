@@ -1,0 +1,36 @@
+{
+  "nav": {
+    "home": "Home",
+    "blog": "Vibe Log",
+    "tools": "Vibe Tools",
+    "games": "Bouncy Games",
+    "fortune": "Vibe Fortune",
+    "admin": "Admin"
+  },
+  "home": {
+    "title": "Welcome to BouncyHachi",
+    "subtitle": "Dive into the vibrant portal for coding vibes, tools, and fun.",
+    "explore": "Explore Now"
+  },
+  "cards": {
+    "blog": {
+      "title": "Vibe Log",
+      "desc": "Evergreen content & coding vibes."
+    },
+    "tools": {
+      "title": "Vibe Tools",
+      "desc": "Simple utility web apps."
+    },
+    "games": {
+      "title": "Bouncy Games",
+      "desc": "Web-based arcade games."
+    },
+    "fortune": {
+      "title": "Vibe Fortune",
+      "desc": "AI Interactive psych tests & tarot."
+    }
+  },
+  "footer": {
+    "copyright": "© 2026 BouncyHachi. All rights reserved."
+  }
+}
