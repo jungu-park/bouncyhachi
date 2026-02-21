@@ -24,7 +24,23 @@ const validateR2Config = () => {
 
 export const compressAndUploadImage = async (file: File): Promise<string> => {
     try {
-        validateR2Config();
+        validateR2Config();    // SVG bypass: Don't compress SVGs as they are vector-based
+        if (file.type === 'image/svg+xml') {
+            // For SVGs, we don't compress, just upload directly
+            const fileExtension = file.name.split('.').pop() || 'svg';
+            const fileName = `uploads/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExtension}`;
+
+            const command = new PutObjectCommand({
+                Bucket: r2Bucket,
+                Key: fileName,
+                Body: file, // Use the original file for SVG
+                ContentType: file.type,
+            });
+
+            await s3Client.send(command);
+            return `${r2PublicUrl}/${fileName}`;
+        }
+
         const options = {
             maxSizeMB: 1, // Compress to max 1MB
             maxWidthOrHeight: 1200,

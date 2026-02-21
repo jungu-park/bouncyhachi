@@ -363,8 +363,8 @@ const Admin = () => {
                         <Sparkles size={24} />
                     </div>
                     <div>
-                        <h1 className="text-lg font-bold tracking-tight">Hachi Portal</h1>
-                        <p className="text-xs text-slate-500 font-medium">Admin Console</p>
+                        <h1 className="text-lg font-bold tracking-tight">Hachi Portal v1.1</h1>
+                        <p className="text-xs text-slate-500 font-medium tracking-tighter">Admin Console (Latest Build)</p>
                     </div>
                 </div>
 
