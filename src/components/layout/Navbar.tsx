@@ -14,7 +14,7 @@ const Navbar = () => {
                     <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-white neon-blue-glow font-bold text-lg">
                         B
                     </div>
-                    <span className="font-bold text-xl tracking-tight hidden sm:block">BouncyHachi</span>
+                    <span className="font-bold text-xl tracking-tight hidden sm:block text-slate-900 dark:text-white">BouncyHachi</span>
                 </Link>
 
                 <nav className="hidden md:flex items-center gap-6">
