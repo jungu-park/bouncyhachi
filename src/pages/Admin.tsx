@@ -37,7 +37,7 @@ const Admin = () => {
 
     const tabs = [
         { name: 'Overview', icon: <LayoutDashboard size={20} />, color: 'text-primary' },
-        { name: 'Blog', icon: <FileText size={20} />, color: 'text-slate-600 dark:text-slate-400' },
+        { name: 'Blog', icon: <FileText size={20} />, color: 'text-slate-600 dark:text-slate-500' },
         { name: 'Tools', icon: <Wrench size={20} />, color: 'text-neon-pink' },
         { name: 'Games', icon: <Gamepad2 size={20} />, color: 'text-green-400' },
         { name: 'Fortune', icon: <Star size={20} />, color: 'text-purple-400' },
@@ -241,7 +241,27 @@ const Admin = () => {
         try {
             setIsUploadingInline(true);
             const url = await compressAndUploadImage(selectedFile);
-            setForm(prev => ({ ...prev, description: (prev.description || '') + `\n![image](${url})\n` }));
+            const markdownImage = `\n![image](${url})\n`;
+
+            const textarea = document.getElementById('markdown-description') as HTMLTextAreaElement;
+            if (textarea) {
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const currentText = form.description || '';
+
+                const before = currentText.substring(0, start);
+                const after = currentText.substring(end);
+
+                setForm(prev => ({ ...prev, description: before + markdownImage + after }));
+
+                // Focus back to textarea and move cursor after injected image
+                setTimeout(() => {
+                    textarea.focus();
+                    textarea.setSelectionRange(start + markdownImage.length, start + markdownImage.length);
+                }, 0);
+            } else {
+                setForm(prev => ({ ...prev, description: (prev.description || '') + markdownImage }));
+            }
         } catch (err) {
             console.error(err);
             alert('Inline image upload failed.');
@@ -291,11 +311,11 @@ const Admin = () => {
     };
 
     if (isAdmin === null) {
-        return <div className="flex h-screen items-center justify-center bg-background-light dark:bg-background-dark text-slate-500">Checking permissions...</div>;
+        return <div className="flex h-screen items-center justify-center bg-background-light dark:bg-background-dark text-slate-600">Checking permissions...</div>;
     }
 
     if (isAdmin === false) {
-        return <div className="flex h-screen items-center justify-center bg-background-light dark:bg-background-dark text-slate-500">Access Denied</div>;
+        return <div className="flex h-screen items-center justify-center bg-background-light dark:bg-background-dark text-slate-600">Access Denied</div>;
     }
 
     const filteredItems = items.filter(item => activeTab === 'Overview' || item.category === activeTab);
@@ -320,7 +340,7 @@ const Admin = () => {
                     </div>
                     <div>
                         <h1 className="text-lg font-bold tracking-tight">Hachi Portal v1.1</h1>
-                        <p className="text-xs text-slate-500 font-medium tracking-tighter">Admin Console (Latest Build)</p>
+                        <p className="text-xs text-slate-600 font-medium tracking-tighter">Admin Console (Latest Build)</p>
                     </div>
                 </div>
 
@@ -330,11 +350,11 @@ const Admin = () => {
                             key={tab.name}
                             onClick={() => setActiveTab(tab.name)}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded transition-colors ${activeTab === tab.name
-                                ? 'bg-primary/10 border-l-4 border-primary text-primary font-semibold'
-                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium'
+                                ? 'bg-primary/20 border-l-4 border-primary text-primary font-bold shadow-sm'
+                                : 'text-slate-700 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 font-medium'
                                 }`}
                         >
-                            <span className={activeTab === tab.name ? 'text-primary' : tab.color}>
+                            <span className={activeTab === tab.name ? 'text-primary drop-shadow-sm' : tab.color}>
                                 {tab.icon}
                             </span>
                             <span className="text-sm">{tab.name}</span>
@@ -345,14 +365,14 @@ const Admin = () => {
                 <div className="p-4 border-t border-slate-200 dark:border-slate-800">
                     <div className="flex items-center justify-between px-2">
                         <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-300 font-bold overflow-hidden">
+                            <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 font-bold overflow-hidden">
                                 {user?.email?.[0].toUpperCase() || 'A'}
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="text-sm font-semibold truncate dark:text-white">{user?.email?.split('@')[0] || 'Admin'}</p>
                             </div>
                         </div>
-                        <button onClick={handleLogout} className="p-2 text-slate-400 hover:text-red-500 transition hover:bg-red-50 dark:hover:bg-red-900/20 rounded">
+                        <button onClick={handleLogout} className="p-2 text-slate-500 hover:text-red-500 transition hover:bg-red-50 dark:hover:bg-red-900/20 rounded">
                             <LogOut size={18} />
                         </button>
                     </div>
@@ -382,7 +402,7 @@ const Admin = () => {
                     {activeTab === 'Admins' ? (
                         <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden min-h-[400px] p-6">
                             <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Users size={20} className="text-indigo-500" /> Admin Management</h3>
-                            <p className="text-slate-500 text-sm mb-6">Manage users who have administrative access to the Hachi Portal.</p>
+                            <p className="text-slate-600 text-sm mb-6">Manage users who have administrative access to the Hachi Portal.</p>
 
                             <form onSubmit={handleAddAdmin} className="flex gap-2 mb-8 max-w-md">
                                 <input
@@ -402,8 +422,8 @@ const Admin = () => {
                                 <table className="w-full text-left border-collapse">
                                     <thead>
                                         <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
-                                            <th className="px-6 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 w-full">Email Address</th>
-                                            <th className="px-6 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 text-right">Actions</th>
+                                            <th className="px-6 py-3 text-xs font-bold uppercase tracking-wider text-slate-600 w-full">Email Address</th>
+                                            <th className="px-6 py-3 text-xs font-bold uppercase tracking-wider text-slate-600 text-right">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
@@ -411,14 +431,14 @@ const Admin = () => {
                                             <tr key={admin.email} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
                                                 <td className="px-6 py-4 font-medium">{admin.email} {admin.email === user?.email && <span className="ml-2 text-xs bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400 px-2 py-0.5 rounded-full">You</span>}</td>
                                                 <td className="px-6 py-4 text-right">
-                                                    <button onClick={() => handleRemoveAdmin(admin.email)} className="text-slate-400 hover:text-red-500 transition-colors p-2 rounded hover:bg-red-50 dark:hover:bg-red-900/20">
+                                                    <button onClick={() => handleRemoveAdmin(admin.email)} className="text-slate-500 hover:text-red-500 transition-colors p-2 rounded hover:bg-red-50 dark:hover:bg-red-900/20">
                                                         <Trash2 size={18} />
                                                     </button>
                                                 </td>
                                             </tr>
                                         ))}
                                         {adminUsers.length === 0 && (
-                                            <tr><td colSpan={2} className="px-6 py-4 text-slate-500 text-center">No admins found.</td></tr>
+                                            <tr><td colSpan={2} className="px-6 py-4 text-slate-600 text-center">No admins found.</td></tr>
                                         )}
                                     </tbody>
                                 </table>
@@ -427,15 +447,15 @@ const Admin = () => {
                     ) : (
                         <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden min-h-[400px]">
                             {loading ? (
-                                <div className="flex items-center justify-center h-64 text-slate-500">Loading...</div>
+                                <div className="flex items-center justify-center h-64 text-slate-600">Loading...</div>
                             ) : (
                                 <table className="w-full text-left border-collapse">
                                     <thead>
                                         <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
-                                            <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 shrink-0 w-16">Image</th>
-                                            <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Name</th>
-                                            <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Category</th>
-                                            <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-right">Actions</th>
+                                            <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-600 shrink-0 w-16">Image</th>
+                                            <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-600">Name</th>
+                                            <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-600">Category</th>
+                                            <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-600 text-right">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
@@ -445,14 +465,14 @@ const Admin = () => {
                                                     {row.imageUrl ? (
                                                         <img src={row.imageUrl} alt={row.name} className="w-10 h-10 rounded object-cover border border-slate-200 dark:border-slate-700" />
                                                     ) : (
-                                                        <div className="w-10 h-10 rounded bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400">
+                                                        <div className="w-10 h-10 rounded bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
                                                             <ImageIcon size={16} />
                                                         </div>
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">{row.name}</span>
-                                                    {row.linkUrl && <p className="text-xs text-slate-500 truncate max-w-[200px] mt-1">{row.linkUrl}</p>}
+                                                    {row.linkUrl && <p className="text-xs text-slate-600 truncate max-w-[200px] mt-1">{row.linkUrl}</p>}
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${getCategoryColor(row.category)}`}>
@@ -461,10 +481,10 @@ const Admin = () => {
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
                                                     <div className="flex justify-end gap-2">
-                                                        <button onClick={() => openModal(row)} className="p-2 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 transition-colors hover:text-primary">
+                                                        <button onClick={() => openModal(row)} className="p-2 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-500 transition-colors hover:text-primary">
                                                             <Edit size={18} />
                                                         </button>
-                                                        <button onClick={() => handleDelete(row.id!)} className="p-2 rounded hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-400 hover:text-red-500 transition-colors">
+                                                        <button onClick={() => handleDelete(row.id!)} className="p-2 rounded hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-500 hover:text-red-500 transition-colors">
                                                             <Trash2 size={18} />
                                                         </button>
                                                     </div>
@@ -473,7 +493,7 @@ const Admin = () => {
                                         ))}
                                         {filteredItems.length === 0 && (
                                             <tr>
-                                                <td colSpan={4} className="p-8 text-center text-slate-500">No items found for {activeTab}.</td>
+                                                <td colSpan={4} className="p-8 text-center text-slate-600">No items found for {activeTab}.</td>
                                             </tr>
                                         )}
                                     </tbody>
@@ -490,7 +510,7 @@ const Admin = () => {
                     <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh]">
                         <div className="flex justify-between items-center p-6 border-b border-slate-200 dark:border-slate-800">
                             <h3 className="text-lg font-bold">{editingItem ? 'Edit Item' : 'Add New Item'}</h3>
-                            <button onClick={closeModal} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><X size={20} /></button>
+                            <button onClick={closeModal} className="text-slate-500 hover:text-slate-600 dark:hover:text-slate-200"><X size={20} /></button>
                         </div>
 
                         <form onSubmit={handleSave} className="p-6 overflow-y-auto space-y-4">
@@ -519,7 +539,7 @@ const Admin = () => {
                                         <input type="file" accept="image/*" onChange={handleInlineImage} className="hidden" disabled={isUploadingInline} />
                                     </label>
                                 </div>
-                                <textarea className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-primary/50 h-32 font-mono text-sm" value={form.description || ''} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Type markdown here... You can embed images via the button above." />
+                                <textarea id="markdown-description" className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-primary/50 h-32 font-mono text-sm" value={form.description || ''} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Type markdown here... You can embed images via the button above." />
                             </div>
 
                             <div>
@@ -532,12 +552,12 @@ const Admin = () => {
                                 {form.imageUrl && !file && (
                                     <img src={form.imageUrl} className="h-24 object-cover rounded mb-2 border border-slate-200 dark:border-slate-700" alt="Current image" />
                                 )}
-                                <input type="file" accept="image/*" onChange={e => setFile(e.target.files?.[0] || null)} className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer" />
+                                <input type="file" accept="image/*" onChange={e => setFile(e.target.files?.[0] || null)} className="w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer" />
                                 {file && <span className="text-xs text-green-500 mt-1 block">New file selected: {file.name} (Will be compressed to Cloudflare R2)</span>}
                             </div>
 
                             <div className="pt-4 flex justify-end gap-3 border-t border-slate-200 dark:border-slate-800 mt-6">
-                                <button type="button" onClick={closeModal} className="px-4 py-2 rounded text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium">Cancel</button>
+                                <button type="button" onClick={closeModal} className="px-4 py-2 rounded text-slate-600 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium">Cancel</button>
                                 <button type="submit" disabled={saving} className="px-6 py-2 rounded bg-primary text-white font-bold neon-blue-glow hover:brightness-110 disabled:opacity-50 flex items-center gap-2">
                                     {saving ? 'Saving...' : 'Save Item'}
                                 </button>

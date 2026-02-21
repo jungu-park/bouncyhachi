@@ -23,16 +23,16 @@ const Tools = () => {
                 <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tight dark:text-white">
                     {t.cards.tools.title}
                 </h1>
-                <p className="text-lg text-slate-600 dark:text-slate-400 max-w-lg mx-auto">
+                <p className="text-lg text-slate-700 dark:text-slate-500 max-w-lg mx-auto">
                     {t.cards.tools.desc}
                 </p>
             </div>
             <div className="w-full">
                 {loading ? (
-                    <div className="text-center text-slate-500 py-12">Loading tools...</div>
+                    <div className="text-center text-slate-700 py-12">Loading tools...</div>
                 ) : items.length === 0 ? (
                     <div className="p-8 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl text-center max-w-2xl mx-auto">
-                        <p className="text-slate-500 dark:text-slate-400 font-medium">Coming Soon</p>
+                        <p className="text-slate-700 dark:text-slate-500 font-medium">Coming Soon</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -58,7 +58,7 @@ const Tools = () => {
                                 </div>
                                 <div className="p-6 flex-1 flex flex-col">
                                     <h2 className="text-xl font-bold mb-2 dark:text-white group-hover:text-neon-pink transition-colors">{item.name}</h2>
-                                    <p className="text-sm text-slate-500 line-clamp-3 flex-1">{item.description}</p>
+                                    <p className="text-sm text-slate-700 line-clamp-3 flex-1">{item.description}</p>
                                 </div>
                             </a>
                         ))}

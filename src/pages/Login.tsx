@@ -33,7 +33,7 @@ const Login = () => {
                         <ShieldCheck className="w-8 h-8" />
                     </div>
                     <h2 className="text-2xl font-bold dark:text-white">Admin Login</h2>
-                    <p className="text-slate-500 text-sm mt-1">Access the Hachi Portal dashboard</p>
+                    <p className="text-slate-600 text-sm mt-1">Access the Hachi Portal dashboard</p>
                 </div>
 
                 {error && <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm rounded">{error}</div>}
@@ -71,7 +71,7 @@ const Login = () => {
                         {loading ? 'Signing in...' : 'Sign In'}
                     </button>
                 </form>
-                <p className="text-center text-xs text-slate-400 mt-8">Secure Environment • Powered by BouncyHachi • © 2026</p>
+                <p className="text-center text-xs text-slate-500 mt-8">Secure Environment • Powered by BouncyHachi • © 2026</p>
             </div>
         </div>
     );

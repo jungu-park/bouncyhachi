@@ -31,6 +31,10 @@
     }
   },
   "footer": {
-    "copyright": "© 2026 BouncyHachi. All rights reserved."
+    "copyright": "© 2026 BouncyHachi. All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "about": "About Us",
+    "contact": "Contact"
   }
 }

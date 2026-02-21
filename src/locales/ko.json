@@ -31,6 +31,10 @@
         }
     },
     "footer": {
-        "copyright": "© 2026 BouncyHachi. All rights reserved."
+        "copyright": "© 2026 BouncyHachi. All rights reserved.",
+        "privacy": "개인정보처리방침",
+        "terms": "이용약관",
+        "about": "소개",
+        "contact": "문의하기"
     }
 }

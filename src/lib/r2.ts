@@ -30,10 +30,13 @@ export const compressAndUploadImage = async (file: File): Promise<string> => {
             const fileExtension = file.name.split('.').pop() || 'svg';
             const fileName = `uploads/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExtension}`;
 
+            const arrayBuffer = await file.arrayBuffer();
+            const bodyBytes = new Uint8Array(arrayBuffer);
+
             const command = new PutObjectCommand({
                 Bucket: r2Bucket,
                 Key: fileName,
-                Body: file, // Use the original file for SVG
+                Body: bodyBytes, // Use the original file converted to Uint8Array for SVG
                 ContentType: file.type,
             });
 
@@ -53,10 +56,13 @@ export const compressAndUploadImage = async (file: File): Promise<string> => {
         const fileExtension = originalName.split('.').pop() || 'jpg';
         const fileName = `uploads/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExtension}`;
 
+        const arrayBuffer = await compressedFile.arrayBuffer();
+        const bodyBytes = new Uint8Array(arrayBuffer);
+
         const command = new PutObjectCommand({
             Bucket: r2Bucket,
             Key: fileName,
-            Body: compressedFile,
+            Body: bodyBytes,
             ContentType: compressedFile.type,
         });
 

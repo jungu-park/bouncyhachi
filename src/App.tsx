@@ -11,6 +11,10 @@ import BlogPost from './pages/BlogPost';
 import Tools from './pages/Tools';
 import Games from './pages/Games';
 import Fortune from './pages/Fortune';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import About from './pages/About';
+import Contact from './pages/Contact';
 
 function App() {
   return (
@@ -23,16 +27,24 @@ function App() {
           <Route path="tools" element={<Tools />} />
           <Route path="arcade" element={<Games />} />
           <Route path="fortune" element={<Fortune />} />
+          <Route path="privacy" element={<PrivacyPolicy />} />
+          <Route path="terms" element={<TermsOfService />} />
+          <Route path="about" element={<About />} />
+          <Route path="contact" element={<Contact />} />
         </Route>
-        <Route path="/login" element={<Login />} />
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute>
-              <Admin />
-            </ProtectedRoute>
-          }
-        />
+        {import.meta.env.DEV && (
+          <Route path="/login" element={<Login />} />
+        )}
+        {import.meta.env.DEV && (
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <Admin />
+              </ProtectedRoute>
+            }
+          />
+        )}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
