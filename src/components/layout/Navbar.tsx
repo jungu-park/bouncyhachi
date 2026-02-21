@@ -18,10 +18,10 @@ const Navbar = () => {
                 </Link>
 
                 <nav className="hidden md:flex items-center gap-6">
-                    <Link to="/blog" className="text-sm font-medium text-slate-700 dark:text-slate-200 hover:text-primary transition-colors">{t.nav.blog}</Link>
-                    <Link to="/tools" className="text-sm font-medium text-slate-700 dark:text-slate-200 hover:text-neon-pink transition-colors">{t.nav.tools}</Link>
-                    <Link to="/arcade" className="text-sm font-medium text-slate-700 dark:text-slate-200 hover:text-green-500 transition-colors">{t.nav.games}</Link>
-                    <Link to="/fortune" className="text-sm font-medium text-slate-700 dark:text-slate-200 hover:text-purple-500 transition-colors">{t.nav.fortune}</Link>
+                    <Link to="/blog" className="text-sm font-medium text-slate-900 dark:text-slate-200 hover:text-primary transition-colors">{t.nav.blog}</Link>
+                    <Link to="/tools" className="text-sm font-medium text-slate-900 dark:text-slate-200 hover:text-neon-pink transition-colors">{t.nav.tools}</Link>
+                    <Link to="/arcade" className="text-sm font-medium text-slate-900 dark:text-slate-200 hover:text-green-500 transition-colors">{t.nav.games}</Link>
+                    <Link to="/fortune" className="text-sm font-medium text-slate-900 dark:text-slate-200 hover:text-purple-500 transition-colors">{t.nav.fortune}</Link>
                 </nav>
 
                 <div className="flex items-center gap-3">

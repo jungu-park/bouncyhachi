@@ -48,7 +48,9 @@ export const compressAndUploadImage = async (file: File): Promise<string> => {
         };
 
         const compressedFile = await imageCompression(file, options);
-        const fileExtension = compressedFile.name.split('.').pop() || 'jpg';
+        // Fallback for missing file.name on Blob returned by imageCompression
+        const originalName = compressedFile.name || file.name || 'image.jpg';
+        const fileExtension = originalName.split('.').pop() || 'jpg';
         const fileName = `uploads/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExtension}`;
 
         const command = new PutObjectCommand({

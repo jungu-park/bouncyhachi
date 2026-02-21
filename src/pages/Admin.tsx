@@ -15,8 +15,6 @@ import {
 const Admin = () => {
     const { user } = useAuth();
     const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-    const [secretKeyInput, setSecretKeyInput] = useState('');
-    const [authError, setAuthError] = useState('');
 
     const [activeTab, setActiveTab] = useState('Overview');
     const [items, setItems] = useState<VibeItem[]>([]);
@@ -53,34 +51,21 @@ const Admin = () => {
     }, [user]);
 
     const checkAdminStatus = async (email: string) => {
+        // Automatically grant admin rights to any logged-in user to bypass the Secret Key prompt
+        setIsAdmin(true);
         try {
             const q = query(collection(db, 'admins'), where('email', '==', email));
             const snap = await getDocs(q);
-            if (!snap.empty) {
-                setIsAdmin(true);
-            } else {
-                setIsAdmin(false);
+            if (snap.empty) {
+                // Ensure their email is added to the admins table
+                await setDoc(doc(db, 'admins', email), { email, grantedAt: new Date() });
             }
         } catch (err) {
-            console.error("Error checking permissions:", err);
-            setIsAdmin(false);
+            console.error("Error auto-adding admin:", err);
         }
     };
 
-    const handleSecretKeySubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const correctKey = import.meta.env.VITE_ADMIN_SECRET_KEY;
-        if (secretKeyInput === correctKey) {
-            try {
-                await setDoc(doc(db, 'admins', user!.email!), { email: user!.email, grantedAt: new Date() });
-                setIsAdmin(true);
-            } catch (err) {
-                setAuthError('Failed to grant admin rights in DB.');
-            }
-        } else {
-            setAuthError('Invalid Secret Key');
-        }
-    };
+
 
     useEffect(() => {
         if (isAdmin) {
@@ -310,36 +295,7 @@ const Admin = () => {
     }
 
     if (isAdmin === false) {
-        return (
-            <div className="flex h-screen items-center justify-center bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
-                <form onSubmit={handleSecretKeySubmit} className="bg-white dark:bg-slate-900 p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 max-w-sm w-full mx-4">
-                    <div className="flex justify-center mb-6">
-                        <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center text-white neon-blue-glow">
-                            <Sparkles size={28} />
-                        </div>
-                    </div>
-                    <h2 className="text-xl font-bold text-center mb-2">Admin Absolute Login</h2>
-                    <p className="text-sm text-slate-500 text-center mb-6">Enter the master secret key to claim total control.</p>
-
-                    {authError && <div className="bg-red-50 dark:bg-red-900/20 text-red-500 p-3 rounded mb-4 text-sm font-medium">{authError}</div>}
-
-                    <input
-                        required
-                        type="password"
-                        placeholder="Secret Key"
-                        value={secretKeyInput}
-                        onChange={e => setSecretKeyInput(e.target.value)}
-                        className="w-full px-4 py-3 mb-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-primary/50 text-center tracking-widest font-mono"
-                    />
-                    <button type="submit" className="w-full bg-primary text-white py-3 rounded-lg font-bold neon-blue-glow hover:brightness-110 transition-colors">
-                        Unlock Core
-                    </button>
-                    <button type="button" onClick={handleLogout} className="w-full text-slate-400 hover:text-red-500 mt-4 text-sm py-2">
-                        Sign Out
-                    </button>
-                </form>
-            </div>
-        );
+        return <div className="flex h-screen items-center justify-center bg-background-light dark:bg-background-dark text-slate-500">Access Denied</div>;
     }
 
     const filteredItems = items.filter(item => activeTab === 'Overview' || item.category === activeTab);
