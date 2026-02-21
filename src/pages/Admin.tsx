@@ -168,6 +168,7 @@ const Admin = () => {
                 }
             }
 
+            console.log('Docx import successful:', { title, markdownLength: markdown.length, firstImageUrl });
             // Pre-fill modal
             setEditingItem(null);
             setForm({
@@ -180,8 +181,8 @@ const Admin = () => {
             setIsModalOpen(true);
 
         } catch (err) {
-            console.error('Failed to import .docx', err);
-            alert('Failed to import .docx file. Ensure it is a valid Word document.');
+            console.error('CRITICAL: Failed to import .docx', err);
+            alert(`Failed to import .docx file: ${err instanceof Error ? err.message : String(err)}`);
         } finally {
             setIsImportingDocx(false);
             setDocxProgress('');
@@ -215,11 +216,14 @@ const Admin = () => {
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
+        console.log('Starting handleSave...', { editingId: editingItem?.id, formName: form.name });
         try {
             let finalImageUrl = form.imageUrl;
 
             if (file) {
+                console.log('Uploading new thumbnail to R2...', file.name);
                 finalImageUrl = await compressAndUploadImage(file);
+                console.log('Thumbnail uploaded success:', finalImageUrl);
             }
 
             const itemData: any = {
@@ -228,16 +232,19 @@ const Admin = () => {
             };
 
             if (editingItem?.id) {
+                console.log('Updating existing item in Firestore...', editingItem.id);
                 await updateItem(editingItem.id, itemData);
             } else {
+                console.log('Adding new item to Firestore...', itemData.name);
                 await addItem(itemData);
             }
 
+            console.log('Item saved successfully.');
             closeModal();
             fetchItems();
         } catch (err) {
-            console.error('Failed to save', err);
-            alert('Failed to save item. Check console.');
+            console.error('CRITICAL: Failed to save', err);
+            alert(`Failed to save item: ${err instanceof Error ? err.message : String(err)}`);
         } finally {
             setSaving(false);
         }

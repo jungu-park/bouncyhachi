@@ -11,13 +11,20 @@ export const s3Client = new S3Client({
     region: 'auto',
     endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
     credentials: {
-        accessKeyId: accessKeyId,
-        secretAccessKey: secretAccessKey,
+        accessKeyId: accessKeyId || '',
+        secretAccessKey: secretAccessKey || '',
     },
 });
 
+const validateR2Config = () => {
+    if (!accountId || !accessKeyId || !secretAccessKey || !r2Bucket) {
+        throw new Error('Missing Cloudflare R2 configuration. Please check your environment variables (VITE_R2_...).');
+    }
+};
+
 export const compressAndUploadImage = async (file: File): Promise<string> => {
     try {
+        validateR2Config();
         const options = {
             maxSizeMB: 1, // Compress to max 1MB
             maxWidthOrHeight: 1200,
