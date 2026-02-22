@@ -18,6 +18,15 @@ export default defineConfig({
               res.writeHead(301, { Location: req.url + '/' })
               res.end()
               return
+            } else {
+              // Try to serve public/<path>/index.html
+              const publicPath = path.resolve(__dirname, 'public', req.url.slice(1), 'index.html')
+              if (fs.existsSync(publicPath)) {
+                const html = fs.readFileSync(publicPath, 'utf-8')
+                res.setHeader('Content-Type', 'text/html')
+                res.end(html)
+                return
+              }
             }
           }
           next()
