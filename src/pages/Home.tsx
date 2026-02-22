@@ -70,8 +70,8 @@ const Home = () => {
                         <div className={`mb-8 p-5 rounded-2xl inline-block w-fit bg-slate-50 dark:bg-slate-800 ${card.glow} transition-all duration-500 group-hover:scale-110 group-hover:bg-white/10 relative z-10`}>
                             {card.icon}
                         </div>
-                        <h3 className="text-4xl font-black mb-4 relative z-10 tracking-tight">{card.title}</h3>
-                        <p className="text-slate-800 dark:text-slate-300 text-lg font-medium leading-relaxed relative z-10">
+                        <h3 className="text-4xl font-black mb-4 relative z-10 tracking-tight text-slate-900 dark:text-white">{card.title}</h3>
+                        <p className="text-slate-800 dark:text-slate-100 text-lg font-medium leading-relaxed relative z-10">
                             {card.desc}
                         </p>
 

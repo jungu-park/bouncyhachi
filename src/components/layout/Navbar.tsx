@@ -30,14 +30,14 @@ const Navbar = () => {
                 <div className="flex items-center gap-4">
                     <button
                         onClick={toggleLang}
-                        className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-black hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-all shadow-sm"
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white text-xs font-black hover:bg-slate-900 hover:text-white dark:hover:bg-slate-600 transition-all shadow-sm"
                     >
                         <Globe className="w-4 h-4" />
                         <span>{lang === 'en' ? 'EN' : 'KR'}</span>
                     </button>
                     <button
                         onClick={toggleTheme}
-                        className="p-2.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white hover:scale-110 active:scale-95 transition-all shadow-sm"
+                        className="p-2.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white hover:scale-110 active:scale-95 transition-all shadow-sm"
                     >
                         {theme === 'dark' ? <Sun className="w-5 h-5 font-bold" /> : <Moon className="w-5 h-5 font-bold" />}
                     </button>

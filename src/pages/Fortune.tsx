@@ -40,7 +40,7 @@ const Fortune = () => {
                             <a
                                 key={item.id}
                                 href={item.linkUrl || '#'}
-                                target={item.linkUrl ? "_blank" : "_self"}
+                                target={item.linkUrl?.startsWith('http') ? "_blank" : "_self"}
                                 rel="noopener noreferrer"
                                 className="group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col relative"
                             >

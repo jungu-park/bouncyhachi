@@ -544,7 +544,7 @@ const Admin = () => {
 
                             <div>
                                 <label className="block text-sm font-semibold mb-1">Link URL (Optional)</label>
-                                <input type="url" className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-primary/50" value={form.linkUrl || ''} onChange={e => setForm({ ...form, linkUrl: e.target.value })} />
+                                <input type="text" placeholder="e.g., /tools/tax or https://..." className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-primary/50" value={form.linkUrl || ''} onChange={e => setForm({ ...form, linkUrl: e.target.value })} />
                             </div>
 
                             <div>
