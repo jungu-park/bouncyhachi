@@ -63,5 +63,9 @@ export default defineConfig({
       }
     }
   ],
+  server: {
+    port: 5173,
+    strictPort: true,
+  },
   envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
 })

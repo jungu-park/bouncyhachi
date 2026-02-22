@@ -47,7 +47,7 @@ export const compressAndUploadImage = async (file: File): Promise<string> => {
         const options = {
             maxSizeMB: 1, // Compress to max 1MB
             maxWidthOrHeight: 1200,
-            useWebWorker: true,
+            useWebWorker: false, // Disabled due to Vite dev server issues leading to Event errors
         };
 
         const compressedFile = await imageCompression(file, options);
