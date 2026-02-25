@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Webcam Bubble Pop | Relax &amp; Pop</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#25c0f4",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#0a1114",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+
+    <!-- MediaPipe Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        .bg-mesh {
+            background-color: #f0f7ff;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(37, 192, 244, 0.3) 0px, transparent 55%),
+                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.3) 0px, transparent 55%),
+                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.3) 0px, transparent 55%),
+                radial-gradient(at 0% 100%, rgba(34, 197, 94, 0.3) 0px, transparent 55%),
+                radial-gradient(at 50% 50%, rgba(251, 191, 36, 0.2) 0px, transparent 50%);
+            background-size: 200% 200%;
+            animation: mesh-flow 15s ease infinite;
+        }
+
+        @keyframes mesh-flow {
+            0% {
+                background-position: 0% 50%
+            }
+
+            50% {
+                background-position: 100% 50%
+            }
+
+            100% {
+                background-position: 0% 50%
+            }
+        }
+
+        .bubble-float {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(4px);
+            z-index: -1;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+                transform: translateY(120vh) translateX(var(--drift-start, 0));
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-20vh) translateX(var(--drift-end, 0));
+                opacity: 1;
+            }
+        }
+
+        .bubble-float-game {
+            animation: floatUp var(--duration, 8s) linear infinite;
+            animation-delay: var(--delay, 0s);
+        }
+
+        .bubble-gloss {
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 70%);
+        }
+
+        .score-glow {
+            text-shadow: 0 0 20px rgba(37, 192, 244, 0.5);
+        }
+
+        .bg-mesh-gameover {
+            background-color: #101e22;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(37, 192, 244, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(37, 192, 244, 0.1) 0px, transparent 50%);
+        }
+
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            border-radius: 50%;
+            z-index: 30;
+            animation: particle-fade var(--p-duration) ease-out forwards;
+        }
+
+        @keyframes particle-fade {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(var(--p-tx), var(--p-ty)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        .pop-ripple {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            pointer-events: none;
+            z-index: 29;
+            animation: ripple-out 0.5s ease-out forwards;
+        }
+
+        @keyframes ripple-out {
+            0% {
+                transform: scale(0.5);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        @keyframes character-fly {
+            0% {
+                transform: translate(0, 0) rotate(0deg) scale(1.2);
+                opacity: 1;
+            }
+
+            20% {
+                transform: translate(0, -20px) rotate(45deg) scale(1.5);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(var(--tx), var(--ty)) rotate(1080deg) scale(0.3);
+                opacity: 0;
+            }
+        }
+
+        .flying-character {
+            position: fixed;
+            z-index: 1000;
+            font-size: 2.5rem;
+            pointer-events: none;
+            animation: character-fly 0.8s cubic-bezier(0.42, 0, 0.58, 1) forwards;
+        }
+
+        .special-bubble {
+            border: 2px solid #fbbf24 !important;
+            box-shadow: 0 0 20px #fbbf24, inset 0 0 20px rgba(251, 191, 36, 0.5) !important;
+            background: rgba(251, 191, 36, 0.1) !important;
+        }
+
+        .special-bubble::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid #fbbf24;
+            animation: pulse-ring 1s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(1.4);
+                opacity: 0;
+            }
+        }
+
+        .pop-flash {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 31;
+            animation: flash-out 0.25s ease-out forwards;
+        }
+
+        @keyframes flash-out {
+            0% {
+                transform: scale(0.1);
+                opacity: 1;
+                filter: brightness(2);
+            }
+
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+                filter: brightness(1);
+            }
+        }
+
+        #landing-screen {
+            background-image:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.2)),
+                url('image/start_bg.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .sharp-text {
+            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.8), 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, #25c0f4, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen selection:bg-primary/30 font-display overflow-hidden select-none">
+
+    <div id="app" class="relative w-full h-full min-h-screen">
+
+        <!-- =======================
+             LANDING SCREEN
+             ======================= -->
+        <section id="landing-screen"
+            class="absolute inset-0 z-50 flex flex-col bg-mesh overflow-y-auto transition-opacity duration-300">
+            <!-- Decorative Floating Bubbles removed -->
+
+            <!-- Navigation -->
+            <header
+                class="w-full max-w-7xl mx-auto px-6 py-4 flex items-center justify-between relative z-10 flex-shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="bg-primary p-2 rounded-lg text-background-dark">
+                        <span class="material-symbols-outlined block text-2xl font-bold">bubble_chart</span>
+                    </div>
+                    <h2 class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">Webcam Bubble Pop
+                    </h2>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main
+                class="flex-1 flex flex-col items-center justify-center p-6 relative z-10 w-full max-w-7xl mx-auto space-y-12">
+                <!-- Hero & Auth Section -->
+                <div
+                    class="glass-effect w-full max-w-3xl rounded-xl p-8 md:p-12 text-center shadow-2xl relative overflow-hidden flex-shrink-0">
+                    <div class="absolute -top-24 -left-24 w-48 h-48 bg-primary/20 blur-[100px] rounded-full"></div>
+                    <div class="relative z-10">
+                        <div
+                            class="inline-flex items-center justify-center bg-primary/20 text-primary px-4 py-1.5 rounded-full mb-6">
+                            <span class="material-symbols-outlined text-sm mr-2">videocam</span>
+                            <span class="text-xs font-bold uppercase tracking-wider leading-none">Privacy
+                                Protected</span>
+                        </div>
+                        <h1
+                            class="text-3xl md:text-5xl font-extrabold mb-4 leading-tight tracking-tight text-slate-800 dark:text-slate-900 sharp-text">
+                            Pop the Bouncy <span class="text-gradient italic">Hachi</span> Bubbles!
+                        </h1>
+                        <p
+                            class="text-base md:text-lg text-slate-700 font-bold mb-8 leading-relaxed max-w-lg mx-auto sharp-text">
+                            Move your hands in front of the camera to pop bubbles and relieve stress. We need camera
+                            access!
+                        </p>
+                        <div class="flex flex-col items-center gap-6">
+                            <button id="btn-start-game"
+                                class="group relative flex items-center justify-center gap-3 bg-primary text-background-dark px-10 py-5 rounded-xl text-lg font-extrabold transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(37,192,244,0.4)] active:scale-95 w-full md:w-auto">
+                                <span
+                                    class="material-symbols-outlined text-2xl transition-transform group-hover:rotate-12">camera_enhance</span>
+                                Allow Camera &amp; Start Game
+                            </button>
+                            <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
+                                <span class="material-symbols-outlined text-lg">shield</span>
+                                <span>No video data ever leaves your browser.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AdSense Compliance Content (Terms, Rules, Privacy) -->
+                <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-6 text-left mb-12">
+                    <article
+                        class="glass-effect p-6 md:p-8 rounded-xl flex flex-col h-full group hover:border-primary/50 transition-all hover:-translate-y-1 shadow-lg">
+                        <div class="flex items-center gap-3 mb-4 text-primary">
+                            <span class="material-symbols-outlined text-3xl font-bold">sports_esports</span>
+                            <h3 class="text-lg font-black text-slate-800">How To Play</h3>
+                        </div>
+                        <p class="text-sm text-slate-700 font-medium leading-relaxed mb-4">
+                            Welcome to Webcam Bubble Pop! This interactive web experience utilizes your device's camera
+                            and browser-based AI to track your hand movements. Simply raise your hand in front of the
+                            lens, align your index finger with the floating bubbles, and "pop" them for points. You have
+                            60 seconds to achieve the highest score possible.
+                        </p>
+                    </article>
+
+                    <article
+                        class="glass-effect p-6 md:p-8 rounded-xl flex flex-col h-full group hover:border-purple-500/50 transition-all hover:-translate-y-1 shadow-lg">
+                        <div class="flex items-center gap-3 mb-4 text-purple-600">
+                            <span class="material-symbols-outlined text-3xl font-bold">policy</span>
+                            <h3 class="text-lg font-black text-slate-800">Privacy Policy</h3>
+                        </div>
+                        <p class="text-sm text-slate-700 font-medium leading-relaxed mb-4">
+                            Your privacy is our utmost priority. The video feed accessed by this application is
+                            processed 100% locally on your device within your web browser using Google MediaPipe.
+                            <strong>No video or image data is ever recorded, transmitted, or stored on our
+                                servers.</strong> We request camera permission strictly for real-time hand tracking
+                            during your active gameplay session.
+                        </p>
+                    </article>
+
+                    <article
+                        class="glass-effect p-6 md:p-8 rounded-xl flex flex-col h-full group hover:border-pink-500/50 transition-all hover:-translate-y-1 shadow-lg">
+                        <div class="flex items-center gap-3 mb-4 text-pink-600">
+                            <span class="material-symbols-outlined text-3xl font-bold">gavel</span>
+                            <h3 class="text-lg font-black text-slate-800">Terms of Use</h3>
+                        </div>
+                        <p class="text-sm text-slate-700 font-medium leading-relaxed mb-4">
+                            By clicking "Allow Camera & Start Game", you agree to use this application for entertainment
+                            purposes. The service is provided "as is" without warranty of any kind. This site may
+                            display Google AdSense advertisements. We are not responsible for the content of third-party
+                            ads. Please ensure you play in a safe environment with adequate lighting for the best
+                            experience.
+                        </p>
+                    </article>
+                </div>
+            </main>
+
+            <footer
+                class="w-full text-center p-6 text-xs text-slate-500 relative z-10 border-t border-white/5 bg-background-dark/50">
+                &copy; 2024 Webcam Bubble Pop Studio. For inquiries, please contact our support team.
+            </footer>
+        </section>
+
+        <!-- =======================
+             HUD SCREEN (GAMEPLAY)
+             ======================= -->
+        <section id="hud-screen"
+            class="absolute inset-0 z-40 hidden flex-col overflow-hidden bg-background-dark transition-opacity duration-300">
+            <!-- Video Feed Background (Hidden for Privacy) -->
+            <video id="webcam-feed" class="absolute inset-0 w-full h-full object-cover z-0 opacity-0" autoplay
+                playsinline></video>
+
+            <!-- Stage Background Overlay -->
+            <div id="stage-background"
+                class="absolute inset-0 z-0 bg-cover bg-center transition-opacity duration-1000 opacity-100 pointer-events-none">
+            </div>
+
+            <canvas id="canvas-overlay" class="absolute inset-0 w-full h-full z-10 pointer-events-none"></canvas>
+
+            <!-- Floating HUD Header -->
+            <header class="relative w-full pt-6 px-6 flex justify-center pointer-events-none z-50">
+                <div
+                    class="flex items-center gap-8 px-8 py-3 bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl pointer-events-auto">
+                    <!-- Stage Section -->
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-purple-400">layers</span>
+                        <div class="flex flex-col">
+                            <span
+                                class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter leading-none">Stage</span>
+                            <span id="stage-display"
+                                class="text-2xl font-extrabold text-slate-100 tabular-nums">1</span>
+                        </div>
+                    </div>
+                    <div class="w-px h-8 bg-white/10"></div>
+                    <!-- Stage Score Section -->
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary">bubbles</span>
+                        <div class="flex flex-col">
+                            <span
+                                class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter leading-none">Stage
+                                Score</span>
+                            <span id="stage-score-display"
+                                class="text-2xl font-extrabold text-slate-100 tabular-nums">0</span>
+                        </div>
+                    </div>
+                    <div class="w-px h-8 bg-white/10"></div>
+                    <!-- Total Score Section -->
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-blue-400">stars</span>
+                        <div class="flex flex-col">
+                            <span
+                                class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter leading-none">Total</span>
+                            <span id="score-display" class="text-2xl font-extrabold text-blue-400 tabular-nums">0</span>
+                        </div>
+                    </div>
+                    <div class="w-px h-8 bg-white/10"></div>
+                    <!-- Target Section -->
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-green-400">task_alt</span>
+                        <div class="flex flex-col">
+                            <span
+                                class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter leading-none">Goal</span>
+                            <span id="goal-display"
+                                class="text-2xl font-extrabold text-green-400 tabular-nums">1000</span>
+                        </div>
+                    </div>
+                    <div class="w-px h-8 bg-white/10"></div>
+                    <!-- Time Section -->
+                    <div class="flex items-center gap-3">
+                        <div class="flex flex-col items-end">
+                            <span
+                                class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter leading-none">Time
+                                Left</span>
+                            <span id="time-display" class="text-2xl font-extrabold text-primary tabular-nums">30s</span>
+                        </div>
+                        <span class="material-symbols-outlined text-slate-100">timer</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Game Over simulation button for testing -->
+            <button id="btn-force-end"
+                class="absolute top-6 right-6 z-50 bg-red-500/80 text-white px-4 py-2 rounded-xl font-bold backdrop-blur-md">Force
+                End</button>
+
+            <!-- Bubble Layer (Container for bubbles spawned via JS) -->
+            <div id="bubble-container" class="absolute inset-0 z-20 pointer-events-none">
+            </div>
+
+            <div id="calibration-alert"
+                class="absolute bottom-6 left-1/2 -translate-x-1/2 z-40 bg-primary/20 backdrop-blur-lg border border-primary/30 px-4 py-2 rounded-full flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-sm animate-pulse">center_focus_strong</span>
+                <span class="text-[10px] font-bold text-white uppercase tracking-wider">Webcam tracking active</span>
+            </div>
+        </section>
+
+        <!-- =======================
+             GAME OVER SCREEN
+             ======================= -->
+        <section id="game-over-screen"
+            class="absolute inset-0 z-50 hidden flex-col items-center justify-center bg-background-dark/80 backdrop-blur-sm transition-opacity duration-300">
+            <!-- Game Background Simulation (Blurred) -->
+            <div
+                class="absolute inset-0 z-0 bg-mesh-gameover flex items-center justify-center filter blur-xl opacity-40 scale-110 pointer-events-none">
+                <div class="grid grid-cols-4 gap-8">
+                    <div class="w-32 h-32 rounded-full bg-primary/40 border-4 border-primary/20"></div>
+                    <div class="w-24 h-24 rounded-full bg-purple-500/30 border-4 border-purple-500/20 translate-y-12">
+                    </div>
+                    <div class="w-40 h-40 rounded-full bg-primary/20 border-4 border-primary/10 -translate-x-10"></div>
+                    <div class="w-20 h-20 rounded-full bg-pink-500/30 border-4 border-pink-500/20 translate-y-20"></div>
+                </div>
+            </div>
+
+            <div
+                class="relative z-10 w-full max-w-[540px] bg-slate-900/40 border border-slate-800 rounded-xl p-8 md:p-12 shadow-2xl flex flex-col items-center text-center">
+                <div
+                    class="mb-2 px-4 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest">
+                    Session Ended
+                </div>
+                <h1 id="game-over-title" class="text-white text-4xl md:text-5xl font-extrabold tracking-tight mb-2">
+                    Stage Clear!</h1>
+                <p id="game-over-message" class="text-slate-400 text-lg font-medium mb-4">Final Score:</p>
+
+                <div class="relative group cursor-default mb-10">
+                    <div class="absolute -inset-4 bg-primary/20 blur-2xl rounded-full opacity-50 transition-opacity">
+                    </div>
+                    <div class="relative">
+                        <span id="final-score"
+                            class="text-primary text-6xl md:text-8xl font-black tracking-tighter score-glow">0</span>
+                        <span class="text-primary/70 text-2xl md:text-3xl font-bold block mt-1">POINTS</span>
+                    </div>
+                </div>
+
+                <!-- Ranking Input (Visible if Top Score) -->
+                <div id="ranking-input-container" class="hidden w-full mb-8 space-y-4">
+                    <p class="text-yellow-400 font-bold animate-bounce">New High Score! Enter Initials:</p>
+                    <div class="flex justify-center gap-2">
+                        <input type="text" id="player-initials" maxlength="3"
+                            class="w-24 h-12 bg-slate-800 border-2 border-primary rounded-xl text-center text-2xl font-bold text-white uppercase outline-none focus:ring-2 focus:ring-primary/50"
+                            placeholder="AAA">
+                        <button id="btn-save-ranking"
+                            class="h-12 px-6 bg-primary text-background-dark font-bold rounded-xl hover:brightness-110 active:scale-95 transition-all">Save</button>
+                    </div>
+                </div>
+
+                <!-- Global Rankings Display -->
+                <div id="rankings-display" class="w-full mb-8 bg-black/30 rounded-xl p-4 border border-white/5">
+                    <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-3">Hall of Fame</h3>
+                    <div id="rankings-list" class="space-y-2">
+                        <!-- Rankings populated via JS -->
+                    </div>
+                </div>
+
+                <div class="w-full space-y-3 mb-6 flex flex-col items-center">
+                    <button id="btn-next-stage"
+                        class="flex w-full cursor-pointer items-center justify-center rounded-xl h-14 bg-primary text-background-dark text-lg font-bold hover:brightness-110 active:scale-[0.98] transition-all shadow-lg shadow-primary/20">
+                        <span class="material-symbols-outlined mr-2">arrow_forward</span>
+                        Next Stage
+                    </button>
+                    <button id="btn-play-again"
+                        class="flex w-full hidden cursor-pointer items-center justify-center rounded-xl h-14 bg-slate-700 text-white text-lg font-bold hover:brightness-110 active:scale-[0.98] transition-all shadow-lg">
+                        <span class="material-symbols-outlined mr-2">replay</span>
+                        Restart Game
+                    </button>
+                    <!-- Buy Me a Coffee Support / PayPal integration -->
+                    <div class="bg-[#FFDD00] w-full rounded-xl p-2 flex flex-col items-center justify-center shadow-md">
+                        <div class="flex items-center text-slate-900 font-bold mb-2">
+                            <span class="material-symbols-outlined mr-2">local_cafe</span> Buy me a coffee! (Support $5)
+                        </div>
+                        <div id="paypal-button-container" class="w-full z-50"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- PayPal SDK -->
+    <script
+        src="https://www.paypal.com/sdk/js?client-id=ATLEyt0cKqbPoYhDuKBXFECmEPOuewjIlpR-d4_1ab6MJg3XhZgKRr-8gWpbR9Zyg4y9x-y4Bhu8nzqK&currency=USD"></script>
+
+    <!-- Basic App Logic with MediaPipe -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const screens = {
+                landing: document.getElementById('landing-screen'),
+                hud: document.getElementById('hud-screen'),
+                gameOver: document.getElementById('game-over-screen')
+            };
+
+            const actions = {
+                startBtn: document.getElementById('btn-start-game'),
+                forceEndBtn: document.getElementById('btn-force-end'),
+                playAgainBtn: document.getElementById('btn-play-again'),
+                supportBtn: document.getElementById('btn-support')
+            };
+
+            const state = {
+                totalScore: 0,
+                stageScore: 0,
+                timeLeft: 30,
+                stage: 1,
+                passScore: 1000,
+                timer: null,
+                isTracking: false,
+                baseDuration: 8,
+                bubbleColors: [
+                    'rgba(37, 192, 244, 0.4)',  // Primary Blue
+                    'rgba(139, 92, 246, 0.4)', // Purple
+                    'rgba(236, 72, 153, 0.4)', // Pink
+                    'rgba(34, 197, 94, 0.4)',  // Green
+                    'rgba(249, 115, 22, 0.4)', // Orange
+                    'rgba(234, 179, 8, 0.4)'   // Yellow
+                ],
+                bgImages: [
+                    'image/backgrounds/bg_1.png',
+                    'image/backgrounds/bg_2.png',
+                    'image/backgrounds/bg_3.png',
+                    'image/backgrounds/bg_4.png',
+                    'image/backgrounds/bg_5.png',
+                    'image/backgrounds/bg_6.png',
+                    'image/backgrounds/bg_7.png',
+                    'image/backgrounds/bg_8.png',
+                    'image/backgrounds/bg_9.png',
+                    'image/backgrounds/bg_10.png'
+                ]
+            };
+
+            const videoElement = document.getElementById('webcam-feed');
+            const canvasElement = document.getElementById('canvas-overlay');
+            const canvasCtx = canvasElement.getContext('2d');
+            const bubbleContainer = document.getElementById('bubble-container'); // Get the bubble container
+
+            // Adjust canvas to match window
+            function resizeCanvas() {
+                canvasElement.width = window.innerWidth;
+                canvasElement.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            function showScreen(screenKey) {
+                Object.values(screens).forEach(screen => screen.classList.add('hidden'));
+                screens[screenKey].classList.remove('hidden');
+            }
+
+            // MediaPipe Hands Setup
+            const hands = new Hands({
+                locateFile: (file) => {
+                    return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+                }
+            });
+            hands.setOptions({
+                maxNumHands: 2,
+                modelComplexity: 1,
+                minDetectionConfidence: 0.5,
+                minTrackingConfidence: 0.5
+            });
+            hands.onResults(onResults);
+
+            let camera = null;
+
+            function onResults(results) {
+                canvasCtx.save();
+                canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+                if (results.multiHandLandmarks) {
+                    for (const landmarks of results.multiHandLandmarks) {
+                        // drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: '#ffffff', lineWidth: 2 }); // Commented out
+                        // drawLandmarks(canvasCtx, landmarks, { color: '#25c0f4', lineWidth: 1, radius: 4 }); // Commented out
+
+                        // Check for bubble collisions using Index Finger Tip (Landmark 8)
+                        const indexTip = landmarks[8];
+
+                        // Fix for camera mirroring: Flip the X coordinate logic if the camera is mirrored.
+                        // For a front-facing selfie camera, left on image is right on screen.
+                        const mirroredX = (1 - indexTip.x) * canvasElement.width;
+                        const realY = indexTip.y * canvasElement.height;
+
+                        // DRAW LARGER TRACKING DOT
+                        canvasCtx.beginPath();
+                        canvasCtx.arc(mirroredX, realY, 12.5, 0, 2 * Math.PI); // Radius 25 -> 12.5
+                        canvasCtx.fillStyle = 'rgba(255, 221, 0, 0.9)'; // Brighter yellow
+                        canvasCtx.shadowBlur = 15;
+                        canvasCtx.shadowColor = 'rgba(255, 221, 0, 0.5)';
+                        canvasCtx.fill();
+
+                        checkBubbleCollisions(mirroredX, realY);
+                    }
+                }
+                canvasCtx.restore();
+            }
+
+            function checkBubbleCollisions(fingerX, fingerY) {
+                const bubbles = document.querySelectorAll('.bubble-float-game');
+                bubbles.forEach(bubble => {
+                    // Only check visible bubbles (not popped)
+                    if (bubble.style.visibility === 'hidden') return;
+
+                    const rect = bubble.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+
+                    // Add a tiny padding offset or keep it strict
+                    const dist = Math.hypot(fingerX - centerX, fingerY - centerY);
+
+                    // Bubble is 24x24 / 28x28 tailwind classes (~96px to 112px width).
+                    // Let's set a realistic hit radius (width/2)
+                    if (dist < (rect.width / 2)) {
+                        popBubble(bubble);
+                    }
+                });
+            }
+
+            function popBubble(bubble) {
+                // To prevent infinite auto-popping on CSS animation bounds, use visibility instead of display none
+                bubble.style.visibility = 'hidden';
+
+                const rect = bubble.getBoundingClientRect();
+
+                // Create flying character
+                const charIcon = bubble.querySelector('.character-icon');
+                if (charIcon) {
+                    const flyChar = document.createElement('div');
+                    flyChar.className = 'flying-character';
+                    flyChar.textContent = charIcon.textContent;
+                    flyChar.style.left = rect.left + 'px';
+                    flyChar.style.top = rect.top + 'px';
+
+                    // Destination: HUD Stage Score
+                    const target = document.getElementById('stage-score-display');
+                    const targetRect = target.getBoundingClientRect();
+
+                    const dx = targetRect.left - rect.left;
+                    const dy = targetRect.top - rect.top;
+
+                    flyChar.style.setProperty('--tx', `${dx}px`);
+                    flyChar.style.setProperty('--ty', `${dy}px`);
+
+                    document.body.appendChild(flyChar);
+                    setTimeout(() => flyChar.remove(), 800);
+                }
+
+                // Add Score
+                const isSpecial = bubble.dataset.special === 'true';
+                const points = isSpecial ? 250 : 50;
+                state.stageScore += points;
+                state.totalScore += points;
+                document.getElementById('stage-score-display').textContent = state.stageScore;
+                document.getElementById('score-display').textContent = state.totalScore;
+
+                // Visual & Audio effects
+                createPopEffect(rect.left + rect.width / 2, rect.top + rect.height / 2, isSpecial);
+                playPopSound(isSpecial);
+
+                // Restart CSS Animation to make it fall from the bottom again after a short delay
+                setTimeout(() => {
+                    bubble.style.animation = 'none'; // Clear current animation
+                    // Force a reflow
+                    void bubble.offsetWidth;
+
+                    // Update speed for next respawn
+                    const isNextSpecial = Math.random() < 0.1;
+                    bubble.dataset.special = isNextSpecial;
+
+                    // Random color for regular bubbles
+                    const randomColor = state.bubbleColors[Math.floor(Math.random() * state.bubbleColors.length)];
+                    bubble.dataset.color = randomColor;
+
+                    const speedMultiplier = Math.max(0.2, 1 - (state.stage - 1) * 0.1);
+                    const eventMultiplier = isNextSpecial ? 0.66 : 1.0;
+                    const currentBase = state.baseDuration * speedMultiplier * eventMultiplier;
+                    const newDuration = Math.random() * (currentBase / 2) + (currentBase / 2);
+                    bubble.style.setProperty('--duration', newDuration + 's');
+
+                    const inner = bubble.querySelector('.bubble-gloss');
+                    if (inner) {
+                        if (isNextSpecial) {
+                            inner.classList.add('special-bubble');
+                            inner.style.backgroundColor = 'rgba(251, 191, 36, 0.1)';
+                        } else {
+                            inner.classList.remove('special-bubble');
+                            inner.style.backgroundColor = randomColor;
+                        }
+
+                        if (isNextSpecial) {
+                            bubble.classList.add('w-16', 'h-16');
+                            bubble.classList.remove('w-24', 'h-24', 'md:w-28', 'md:h-28');
+                        } else {
+                            bubble.classList.remove('w-16', 'h-16');
+                            bubble.classList.add('w-24', 'h-24', 'md:w-28', 'md:h-28');
+                        }
+                    }
+
+                    bubble.style.animation = 'floatUp var(--duration) linear infinite backwards';
+                    bubble.style.visibility = 'visible';
+                }, Math.random() * 2000 + 1000);
+            }
+
+            async function startCameraAndTracking() {
+                if (!camera) {
+                    camera = new Camera(videoElement, {
+                        onFrame: async () => {
+                            await hands.send({ image: videoElement });
+                        },
+                        width: 1280,
+                        height: 720
+                    });
+                }
+                await camera.start();
+                state.isTracking = true;
+            }
+
+            function stopCamera() {
+                if (camera) {
+                    camera.stop();
+                    state.isTracking = false;
+                }
+            }
+
+            function startGame(reset = true) {
+                if (reset) {
+                    state.totalScore = 0;
+                    state.stage = 1;
+                }
+                state.stageScore = 0;
+                state.timeLeft = 30;
+                state.passScore = state.stage * 1000;
+
+                document.getElementById('stage-score-display').textContent = state.stageScore;
+                document.getElementById('score-display').textContent = state.totalScore;
+                document.getElementById('stage-display').textContent = state.stage;
+                document.getElementById('goal-display').textContent = state.passScore;
+                document.getElementById('time-display').textContent = state.timeLeft + 's';
+
+                // Update Background
+                const bgIndex = (state.stage - 1) % state.bgImages.length;
+                const bgElement = document.getElementById('stage-background');
+                bgElement.style.backgroundImage = `url('${state.bgImages[bgIndex]}')`;
+                bgElement.style.opacity = '1.0';
+
+                showScreen('hud');
+                startCameraAndTracking();
+
+                bubbleContainer.innerHTML = '';
+                const bubbleCount = 15;
+                for (let i = 0; i < bubbleCount; i++) {
+                    createBubble();
+                }
+
+                if (state.timer) clearInterval(state.timer);
+                state.timer = setInterval(() => {
+                    state.timeLeft--;
+                    document.getElementById('time-display').textContent = state.timeLeft + 's';
+                    if (state.timeLeft <= 0) {
+                        endGame();
+                    }
+                }, 1000);
+            }
+
+            function createBubble() {
+                const isSpecial = Math.random() < 0.1;
+                const bubble = document.createElement('div');
+                bubble.dataset.special = isSpecial;
+
+                // Random color for regular bubbles
+                const randomColor = state.bubbleColors[Math.floor(Math.random() * state.bubbleColors.length)];
+                bubble.dataset.color = randomColor;
+
+                const sizeClasses = isSpecial ? 'w-16 h-16' : 'w-24 h-24 md:w-28 md:h-28';
+                bubble.className = `${sizeClasses} flex items-center justify-center absolute z-20 pointer-events-auto cursor-pointer bubble-float-game`;
+
+                const left = Math.random() * 90;
+                const speedMultiplier = Math.max(0.2, 1 - (state.stage - 1) * 0.1);
+                const eventMultiplier = isSpecial ? 0.66 : 1.0;
+                const currentBase = state.baseDuration * speedMultiplier * eventMultiplier;
+                const duration = Math.random() * (currentBase / 2) + (currentBase / 2);
+
+                const driftStart = (Math.random() - 0.5) * 50 + 'px';
+                const driftEnd = (Math.random() - 0.5) * 100 + 'px';
+
+                bubble.style.left = left + '%';
+                bubble.style.setProperty('--duration', duration + 's');
+                bubble.style.setProperty('--drift-start', driftStart);
+                bubble.style.setProperty('--drift-end', driftEnd);
+
+                const delay = Math.random() * 5 + 's';
+                bubble.style.animation = `floatUp ${duration}s linear ${delay} infinite backwards`;
+
+                const inner = document.createElement('div');
+                let innerClass = 'relative w-full h-full rounded-full border-2 border-white/30 backdrop-blur-[2px] shadow-[inset_0_0_20px_rgba(255,255,255,0.3)] flex items-center justify-center transition-transform active:scale-95 bubble-gloss overflow-hidden';
+                if (isSpecial) innerClass += ' special-bubble';
+                inner.className = innerClass;
+
+                if (isSpecial) {
+                    inner.style.backgroundColor = 'rgba(251, 191, 36, 0.1)';
+                } else {
+                    inner.style.backgroundColor = randomColor;
+                }
+
+                const img = document.createElement('img');
+                const images = ['image/버블1.png', 'image/버블2.png', 'image/버블3.png', 'image/버블5.png', 'image/버블6.png'];
+                const randomImg = images[Math.floor(Math.random() * images.length)];
+                img.src = randomImg + '?v=' + new Date().getTime();
+
+                const scale = Math.max(0.2, 0.7 * Math.pow(0.9, state.stage - 1));
+                img.style.width = (scale * 100) + '%';
+                img.style.height = (scale * 100) + '%';
+
+                img.className = 'object-contain pointer-events-none drop-shadow-lg';
+                inner.appendChild(img);
+
+                const highlight = document.createElement('div');
+                highlight.className = 'absolute top-[20%] left-[20%] w-[20%] h-[20%] bg-white/40 rounded-full filter blur-[1px] pointer-events-none';
+                inner.appendChild(highlight);
+
+                const characters = ['🐶', '🐱', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐸', '🦄'];
+                const character = isSpecial ? '💎' : characters[Math.floor(Math.random() * characters.length)];
+
+                const charContainer = document.createElement('div');
+                charContainer.className = 'character-icon pointer-events-none select-none';
+                charContainer.style.fontSize = '2rem';
+                charContainer.textContent = character;
+                inner.appendChild(charContainer);
+
+                bubble.appendChild(inner);
+                bubbleContainer.appendChild(bubble);
+            }
+
+            // --- AUDIO & VISUAL EFFECTS HELPERS ---
+            let audioCtx = null;
+            function initAudio() {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            function playPopSound(isSpecial) {
+                initAudio();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                // Refined cheerful pop: Faster decay, higher pitch sweep
+                osc.type = 'sine';
+                const startFreq = isSpecial ? 1800 : 1200;
+                osc.frequency.setValueAtTime(startFreq, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(now + 0.15);
+
+                // Add a "click" for punch
+                const noise = audioCtx.createOscillator();
+                const noiseGain = audioCtx.createGain();
+                noise.type = 'square';
+                noise.frequency.setValueAtTime(400, now);
+                noiseGain.gain.setValueAtTime(0.1, now);
+                noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+                noise.connect(noiseGain);
+                noiseGain.connect(audioCtx.destination);
+                noise.start();
+                noise.stop(now + 0.02);
+            }
+
+            function createPopEffect(x, y, isSpecial) {
+                // FLASH EFFECT (PANG!)
+                const flash = document.createElement('div');
+                flash.className = 'pop-flash';
+                flash.style.left = (x - 50) + 'px';
+                flash.style.top = (y - 50) + 'px';
+                flash.style.width = '100px';
+                flash.style.height = '100px';
+                const flashColor = isSpecial ? 'radial-gradient(circle, rgba(251, 191, 36, 0.8) 0%, rgba(251, 191, 36, 0) 70%)' : 'radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%)';
+                flash.style.background = flashColor;
+                document.body.appendChild(flash);
+                setTimeout(() => flash.remove(), 300);
+
+                // RIPPLE EFFECT
+                const ripple = document.createElement('div');
+                ripple.className = 'pop-ripple';
+                ripple.style.left = (x - 20) + 'px';
+                ripple.style.top = (y - 20) + 'px';
+                ripple.style.width = '40px';
+                ripple.style.height = '40px';
+                if (isSpecial) ripple.style.borderColor = '#fbbf24';
+                document.body.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+
+                const count = isSpecial ? 40 : 25;
+                for (let i = 0; i < count; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'particle';
+                    const size = Math.random() * (isSpecial ? 15 : 10) + 5;
+                    p.style.width = size + 'px';
+                    p.style.height = size + 'px';
+                    p.style.left = (x - size / 2) + 'px';
+                    p.style.top = (y - size / 2) + 'px';
+
+                    const color = isSpecial ? '#fbbf24' : (Math.random() > 0.5 ? '#25c0f4' : '#ffffff');
+                    p.style.backgroundColor = color;
+                    p.style.boxShadow = `0 0 15px ${color}`;
+
+                    const angle = Math.random() * Math.PI * 2;
+                    const velocity = Math.random() * (isSpecial ? 300 : 220) + 100;
+                    const tx = Math.cos(angle) * velocity;
+                    const ty = Math.sin(angle) * velocity;
+
+                    p.style.setProperty('--p-tx', tx + 'px');
+                    p.style.setProperty('--p-ty', ty + 'px');
+                    p.style.setProperty('--p-duration', (Math.random() * 0.3 + 0.3) + 's');
+
+                    document.body.appendChild(p);
+                    setTimeout(() => p.remove(), 800);
+                }
+            }
+
+            // --- THREE.JS LOBBY BACKGROUND ---
+            let lobbyScene, lobbyCamera, lobbyRenderer, lobbyBubbles = [];
+            function initThreeLobby() {
+                const landingScreen = document.getElementById('landing-screen');
+                if (!landingScreen) return;
+
+                const canvasBox = document.createElement('div');
+                canvasBox.id = 'three-bg';
+                canvasBox.style.position = 'absolute';
+                canvasBox.style.inset = '0';
+                canvasBox.style.zIndex = '0';
+                canvasBox.style.pointerEvents = 'none';
+                landingScreen.prepend(canvasBox);
+
+                lobbyScene = new THREE.Scene();
+                lobbyCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                lobbyRenderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                lobbyRenderer.setSize(window.innerWidth, window.innerHeight);
+                lobbyRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                canvasBox.appendChild(lobbyRenderer.domElement);
+
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+                lobbyScene.add(ambientLight);
+
+                const pointLight = new THREE.PointLight(0x25c0f4, 1.5);
+                pointLight.position.set(5, 5, 5);
+                lobbyScene.add(pointLight);
+
+                const geometry = new THREE.SphereGeometry(1, 32, 32);
+                const material = new THREE.MeshPhongMaterial({
+                    color: 0x25c0f4,
+                    transparent: true,
+                    opacity: 0.3,
+                    shininess: 100,
+                    specular: 0xffffff
+                });
+
+                for (let i = 0; i < 20; i++) {
+                    const randomColor = state.bubbleColors[Math.floor(Math.random() * state.bubbleColors.length)];
+                    const bubbleMaterial = material.clone();
+                    bubbleMaterial.color.setStyle(randomColor);
+                    const mesh = new THREE.Mesh(geometry, bubbleMaterial);
+                    resetLobbyBubble(mesh);
+                    mesh.position.y = Math.random() * 20 - 10;
+                    lobbyScene.add(mesh);
+                    lobbyBubbles.push(mesh);
+                }
+
+                lobbyCamera.position.z = 10;
+                animateThreeLobby();
+            }
+
+            function resetLobbyBubble(mesh) {
+                mesh.position.x = (Math.random() - 0.5) * 20;
+                mesh.position.y = -12;
+                mesh.position.z = (Math.random() - 0.5) * 10;
+                const scale = Math.random() * 0.8 + 0.3;
+                mesh.scale.set(scale, scale, scale);
+                mesh.userData.speed = Math.random() * 0.02 + 0.01;
+                mesh.userData.wobble = Math.random() * 100;
+            }
+
+            function animateThreeLobby() {
+                if (!lobbyRenderer) return;
+                requestAnimationFrame(animateThreeLobby);
+
+                lobbyBubbles.forEach(b => {
+                    b.position.y += b.userData.speed;
+                    b.position.x += Math.sin(Date.now() * 0.001 + b.userData.wobble) * 0.005;
+                    if (b.position.y > 12) resetLobbyBubble(b);
+                });
+
+                lobbyRenderer.render(lobbyScene, lobbyCamera);
+            }
+
+            window.addEventListener('resize', () => {
+                if (lobbyCamera && lobbyRenderer) {
+                    lobbyCamera.aspect = window.innerWidth / window.innerHeight;
+                    lobbyCamera.updateProjectionMatrix();
+                    lobbyRenderer.setSize(window.innerWidth, window.innerHeight);
+                }
+            });
+
+            // Start Three background
+            window.addEventListener('load', initThreeLobby);
+
+            function nextStage() {
+                state.stage++;
+                startGame(false);
+            }
+
+            function endGame() {
+                clearInterval(state.timer);
+                stopCamera();
+
+                const isCleared = state.stageScore >= state.passScore;
+                document.getElementById('final-score').textContent = state.totalScore;
+
+                const title = document.getElementById('game-over-title');
+                const nextBtn = document.getElementById('btn-next-stage');
+                const retryBtn = document.getElementById('btn-play-again');
+
+                if (isCleared) {
+                    title.textContent = "Stage Clear!";
+                    title.classList.remove('text-red-500');
+                    title.classList.add('text-white');
+                    nextBtn.classList.remove('hidden');
+                    retryBtn.classList.add('hidden');
+                    nextBtn.textContent = "Next Stage";
+                } else {
+                    title.textContent = "Stage Failed";
+                    title.classList.add('text-red-500');
+                    title.classList.remove('text-white');
+                    nextBtn.classList.add('hidden');
+                    retryBtn.classList.remove('hidden');
+                    retryBtn.innerHTML = '<span class="material-symbols-outlined mr-2">replay</span> Retry Stage';
+                }
+
+                // Rankings Check
+                checkRankings();
+                showScreen('gameOver');
+            }
+
+            function getRankings() {
+                const data = localStorage.getItem('bubblePopRankings');
+                return data ? JSON.parse(data) : [];
+            }
+
+            function checkRankings() {
+                const rankings = getRankings();
+                const container = document.getElementById('ranking-input-container');
+
+                // If top 5 or rankings empty
+                if (rankings.length < 5 || state.totalScore > (rankings[rankings.length - 1]?.score || 0)) {
+                    container.classList.remove('hidden');
+                } else {
+                    container.classList.add('hidden');
+                }
+                updateRankingsDisplay();
+            }
+
+            function saveRanking() {
+                const initials = document.getElementById('player-initials').value.toUpperCase() || 'AAA';
+                let rankings = getRankings();
+
+                rankings.push({ initials, score: state.totalScore, date: new Date().toLocaleDateString() });
+                rankings.sort((a, b) => b.score - a.score);
+                rankings = rankings.slice(0, 5); // Keep top 5
+
+                localStorage.setItem('bubblePopRankings', JSON.stringify(rankings));
+                document.getElementById('ranking-input-container').classList.add('hidden');
+                updateRankingsDisplay();
+            }
+
+            function updateRankingsDisplay() {
+                const list = document.getElementById('rankings-list');
+                const rankings = getRankings();
+
+                if (rankings.length === 0) {
+                    list.innerHTML = '<p class="text-slate-500 text-sm italic">No records yet. Be the first!</p>';
+                    return;
+                }
+
+                list.innerHTML = rankings.map((r, i) => `
+                    <div class="flex items-center justify-between text-sm py-1 border-b border-white/5 last:border-0">
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-primary w-4">${i + 1}.</span>
+                            <span class="font-extrabold text-white tracking-widest">${r.initials}</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="text-slate-400 text-[10px]">${r.date}</span>
+                            <span class="font-black text-primary">${r.score.toLocaleString()}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Event Listeners
+            actions.startBtn.addEventListener('click', () => startGame(true));
+            actions.forceEndBtn.addEventListener('click', endGame);
+            document.getElementById('btn-next-stage').addEventListener('click', nextStage);
+            actions.playAgainBtn.addEventListener('click', () => startGame(false)); // Retry Stage: false means don't reset totalScore
+            document.getElementById('btn-save-ranking').addEventListener('click', saveRanking);
+
+            // Initialization for PayPal
+            if (window.paypal) {
+                paypal.Buttons({
+                    createOrder: function (data, actions) {
+                        return actions.order.create({
+                            purchase_units: [{
+                                description: "Coffee Support for Bubble Pop Game",
+                                amount: {
+                                    value: '5.00' // $5 fixed coffee amount
+                                }
+                            }]
+                        });
+                    },
+                    onApprove: function (data, actions) {
+                        return actions.order.capture().then(function (details) {
+                            alert('Thank you so much for the coffee! ' + details.payer.name.given_name);
+                        });
+                    },
+                    style: {
+                        color: 'gold',
+                        shape: 'rect',
+                        label: 'paypal',
+                        height: 40
+                    }
+                }).render('#paypal-button-container');
+            }
+        });
+    </script>
+</body>
+
+</html>
