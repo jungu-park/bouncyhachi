@@ -15,6 +15,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import WebToMarkdown from './pages/WebToMarkdown';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
           <Route path="terms" element={<TermsOfService />} />
           <Route path="about" element={<About />} />
           <Route path="contact" element={<Contact />} />
+          <Route path="tools/web-to-markdown" element={<WebToMarkdown />} />
         </Route>
         {import.meta.env.DEV && (
           <Route path="/login" element={<Login />} />

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Web-to-Markdown API | RAG Optimization Tool</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="background-effects">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="grid-overlay"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="container nav-content">
+            <div class="logo">
+                <span class="logo-icon">{'<'}< /span>
+                        <span class="logo-text">Vibe<span class="neon-text">Toolz</span></span>
+                        <span class="logo-icon">{'>'}</span>
+            </div>
+            <div class="nav-actions">
+                <button id="lang-toggle" class="lang-btn">KO</button>
+                <a href="https://apify.com/hachi-dev/universal-web-to-markdown" target="_blank" class="nav-btn"
+                    data-i18n="navBtn">Get API Key</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Home / Hero Section -->
+        <section class="hero-section">
+            <div class="container hero-content">
+                <div class="hero-text-area">
+                    <div class="badge fade-in-up" data-i18n="heroBadge">🌟 NEW API RELEASE</div>
+                    <h1 class="main-title fade-in-up delay-1" data-i18n="heroTitle" data-i18n-html="true">
+                        The ultimate <br><span class="gradient-text">data refining</span> tool for RAG
+                    </h1>
+                    <p class="sub-title fade-in-up delay-2" data-i18n="heroSub">
+                        Drop the noisy HTML. Convert any webpage into clean, LLM-friendly Markdown in 1 second.
+                    </p>
+                    <div class="cta-wrapper fade-in-up delay-3">
+                        <a href="https://apify.com/hachi-dev/universal-web-to-markdown" target="_blank"
+                            class="cta-button primary-btn">
+                            <span class="btn-text" data-i18n="heroCta">Start on Apify Store</span>
+                            <span class="btn-icon">→</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 3D / Code Animation Area -->
+                <div class="hero-visual fade-in-up delay-4">
+                    <div class="code-transformer-window">
+                        <div class="window-header">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                            <span class="window-title">api-request.js</span>
+                        </div>
+                        <div class="window-body">
+                            <pre><code class="language-js">
+<span class="keyword">const</span> <span class="variable">response</span> = <span class="keyword">await</span> fetch(<span class="string">'/api/convert'</span>, {
+  method: <span class="string">'POST'</span>,
+  body: JSON.<span class="function">stringify</span>({ 
+    url: <span class="string">'https://noisy-website.com'</span> 
+  })
+});
+
+<span class="keyword">const</span> { <span class="variable">markdown</span> } = <span class="keyword">await</span> response.<span class="function">json</span>();
+<span class="comment">// 🚀 1.2s: Clean Markdown Extracted!</span>
+                            </code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features-section">
+            <div class="container">
+                <div class="section-header text-center fade-in-up">
+                    <h2 class="section-title" data-i18n="featTitle">Why choose Universal Markdown API?</h2>
+                    <p class="section-desc" data-i18n="featDesc">Providing an overwhelming pipeline experience to boost
+                        LLM performance.</p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card glass-panel fade-in-up delay-1">
+                        <div class="feature-icon icon-broom">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M16 3H21V8" stroke="url(#paint0_linear)" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M4 20L21 3" stroke="url(#paint0_linear)" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M21 16V21H16" stroke="url(#paint0_linear)" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M15 15L9 21" stroke="url(#paint0_linear)" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M9 9L3 15" stroke="url(#paint0_linear)" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <defs>
+                                    <linearGradient id="paint0_linear" x1="12" y1="3" x2="12" y2="21"
+                                        gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#00d2ff" />
+                                        <stop offset="1" stop-color="#3a7bd5" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title" data-i18n="feat1Title">Pure Content Extraction</h3>
+                        <p class="feature-text" data-i18n="feat1Desc">Automatically filters out ads, footers, navigation
+                            bars, and noisy elements intelligently to extract pure body content.</p>
+                    </div>
+
+                    <div class="feature-card glass-panel fade-in-up delay-2">
+                        <div class="feature-icon icon-link">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M10 13C10.5304 13.5304 11.25 13.8284 12 13.8284C12.75 13.8284 13.4696 13.5304 14 13L18.5 8.5C19.4282 7.57175 19.9497 6.31295 19.9497 5C19.9497 3.68705 19.4282 2.42825 18.5 1.5C17.5717 0.571748 16.313 0.0502529 15 0.0502529C13.687 0.0502529 12.4282 0.571748 11.5 1.5L8.5 4.5"
+                                    stroke="url(#paint1_linear)" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path
+                                    d="M14 11C13.4696 10.4696 12.75 10.1716 12 10.1716C11.25 10.1716 10.5304 10.4696 10 11L5.5 15.5C4.57175 16.4283 4.05025 17.6871 4.05025 19C4.05025 20.3129 4.57175 21.5717 5.5 22.5C6.42825 23.4283 7.68705 23.9497 9 23.9497C10.3129 23.9497 11.5717 23.4283 12.5 22.5L15.5 19.5"
+                                    stroke="url(#paint1_linear)" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <defs>
+                                    <linearGradient id="paint1_linear" x1="12" y1="0.0502529" x2="12" y2="23.9497"
+                                        gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#b92b27" />
+                                        <stop offset="1" stop-color="#1565C0" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title" data-i18n="feat2Title">RAG-Optimized URLs</h3>
+                        <p class="feature-text" data-i18n="feat2Desc">Perfectly converts all relative paths and image
+                            sources to absolute URLs, preventing context and reference errors in LLMs.</p>
+                    </div>
+
+                    <div class="feature-card glass-panel fade-in-up delay-3">
+                        <div class="feature-icon icon-rocket">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="url(#paint2_linear)"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                <defs>
+                                    <linearGradient id="paint2_linear" x1="12" y1="2" x2="12" y2="22"
+                                        gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#f12711" />
+                                        <stop offset="1" stop-color="#f5af19" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title" data-i18n="feat3Title">Zero-Cost Engine</h3>
+                        <p class="feature-text" data-i18n="feat3Desc">Achieves extreme parsing speed utilizing Cheerio
+                            instead of heavy browsers that consume excess resources. Drastically cuts computing costs.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Before After Section -->
+        <section class="comparison-section">
+            <div class="container">
+                <div class="section-header text-center fade-in-up">
+                    <h2 class="section-title" data-i18n="compTitle">The Transformation</h2>
+                    <p class="section-desc" data-i18n="compDesc">A chaotic DOM tree reborn as refined Markdown
+                        knowledge.</p>
+                </div>
+
+                <div class="comparison-container fade-in-up delay-1">
+                    <div class="code-box before-box glass-panel">
+                        <div class="box-header">
+                            <span class="label error">Target: Raw HTML</span>
+                        </div>
+                        <div class="box-content">
+                            <div class="code-overlay noise">
+                                <div>&lt;html&gt;</div>
+                                <div> &lt;body&gt;</div>
+                                <div class="dim">&lt;!-- 2MB of JS libs --&gt;</div>
+                                <div class="dim">&lt;nav class="header"&gt;...&lt;/nav&gt;</div>
+                                <div class="dim">&lt;script src="ads.js"&gt;&lt;/script&gt;</div>
+                                <div> &lt;main id="content"&gt;</div>
+                                <div> &lt;div class="article-body font-size-lg"&gt;</div>
+                                <div> &lt;h1&gt;LLM Architecture&lt;/h1&gt;</div>
+                                <div> &lt;p&gt;Transformers are...&lt;/p&gt;</div>
+                                <div> &lt;img src="/img/arch.png" alt="Arch"&gt;</div>
+                                <div class="dim">&lt;div class="share-btns"&gt;...&lt;/div&gt;</div>
+                                <div> &lt;a href="/next"&gt;Next Page&lt;/a&gt;</div>
+                                <div> &lt;/div&gt;</div>
+                                <div> &lt;/main&gt;</div>
+                                <div class="dim">&lt;footer&gt;Copyright 2026&lt;/footer&gt;</div>
+                                <div> &lt;/body&gt;</div>
+                                <div>&lt;/html&gt;</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="comparison-divider">
+                        <div class="animated-arrow">➔</div>
+                    </div>
+
+                    <div class="code-box after-box glass-panel">
+                        <div class="box-header">
+                            <span class="label success">Result: Clean Markdown</span>
+                            <span class="ms-badge">0.8s</span>
+                        </div>
+                        <div class="box-content markdown-result" id="typing-md">
+                            # LLM Architecture
+
+                            Transformers are...
+
+                            ![Arch](https://noisy-website.com/img/arch.png)
+
+                            [Next Page](https://noisy-website.com/next)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section class="pricing-section">
+            <div class="container">
+                <div class="section-header text-center fade-in-up">
+                    <h2 class="section-title" data-i18n="priceTitle">Build your AI pipeline with unbeatable efficiency
+                    </h2>
+                    <p class="section-desc" data-i18n="priceDesc">Forget opaque pricing. Pay only for what you use, at
+                        some of the lowest rates in the industry.</p>
+                </div>
+
+                <div class="pricing-card glass-panel text-center fade-in-up delay-1">
+                    <div class="price-header">
+                        <div class="price-tier" data-i18n="priceTier">Developer API</div>
+                        <div class="price-amount">$0.0005<span class="price-unit">/ page</span></div>
+                    </div>
+
+                    <ul class="price-features">
+                        <li>
+                            <span class="check-icon">✓</span>
+                            <span data-i18n="priceStart" data-i18n-html="true">Actor Start Cost:
+                                <strong>$0.01</strong></span>
+                        </li>
+                        <li>
+                            <span class="check-icon">✓</span>
+                            <span data-i18n="priceData" data-i18n-html="true">Data Processing: <strong>$0.50</strong>
+                                per 1,000 pages</span>
+                        </li>
+                        <li>
+                            <span class="check-icon">✓</span>
+                            <span data-i18n="pricePlatform" data-i18n-html="true">Platform Fee:
+                                <strong>Free</strong></span>
+                        </li>
+                    </ul>
+
+                    <a href="https://apify.com/hachi-dev/universal-web-to-markdown" target="_blank"
+                        class="cta-button primary-btn full-width">
+                        <span class="btn-text" data-i18n="priceCta">Start Scraping Now</span>
+                    </a>
+
+                    <div class="trust-badges">
+                        <span class="badge-text" data-i18n="trustBadge">Secure Payments Powered by</span>
+                        <div class="badge-logos">
+                            <span class="trust-brand apify">Apify</span>
+                            <span class="trust-brand divider">×</span>
+                            <span class="trust-brand paypal">PayPal</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Technical Deep Dive Section -->
+            <section class="deep-dive-section">
+                <div class="container text-center fade-in-up">
+                    <h2 class="section-title" data-i18n="diveTitle">Technical Deep Dive</h2>
+                    <p class="section-desc" data-i18n="diveDesc">How did I build this RAG-Ready API?</p>
+                    <div class="cta-wrapper">
+                        <a href="/vibe-log/web-to-markdown-devlog" class="cta-button primary-btn shine-effect">
+                            <span class="btn-text" data-i18n="diveCta">Read the Devlog</span>
+                            <span class="btn-icon">🚀</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 VibeToolz - A Division of Antigravity AI</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

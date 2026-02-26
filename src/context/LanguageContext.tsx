@@ -15,7 +15,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [lang, setLang] = useState<Language>(() => {
         const saved = localStorage.getItem('bouncyhachi-lang');
-        return (saved === 'ko' || saved === 'en') ? saved : 'ko';
+        return (saved === 'ko' || saved === 'en') ? saved : 'en';
     });
 
     const toggleLang = () => {

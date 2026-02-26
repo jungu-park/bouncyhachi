@@ -36,5 +36,33 @@
         "terms": "이용약관",
         "about": "소개",
         "contact": "문의하기"
+    },
+    "webToMarkdown": {
+        "navBtn": "API Key 발급",
+        "heroBadge": "🌟 NEW API RELEASE",
+        "heroTitle": "RAG를 위한 가장 <br><span class=\"gradient-text\">완벽한 데이터 정제</span> 도구",
+        "heroSub": "노이즈 가득한 HTML을 버리세요. 어떤 웹페이지든 LLM이 가장 사랑하는 깔끔한 Markdown으로 1초 만에 변환합니다.",
+        "heroCta": "Apify 스토어에서 바로 시작하기",
+        "featTitle": "Why choose Universal Markdown API?",
+        "featDesc": "LLM 성능 향상을 위한 압도적인 파이프라인 경험을 제공합니다.",
+        "feat1Title": "순수 콘텐츠 추출",
+        "feat1Desc": "광고, 푸터, 내비게이션 바 등 불필요한 노이즈를 자동으로 쳐내고 순수한 본문 콘텐츠만 지능적으로 추출합니다.",
+        "feat2Title": "RAG 최적화 URL 변환",
+        "feat2Desc": "모든 상대 경로 링크와 이미지 주소를 절대 경로(Absolute URL)로 완벽하게 변환하여 LLM의 맥락 파악 및 참조 오류를 방지합니다.",
+        "feat3Title": "Zero-Cost 초고속 엔진",
+        "feat3Desc": "초과 리소스를 소모하는 무거운 브라우저 대신 Cheerio를 활용해 극강의 파싱 속도를 완성했습니다. 컴퓨팅 비용을 극단적으로 낮춥니다.",
+        "compTitle": "데이터 변환 시뮬레이션",
+        "compDesc": "어지러운 DOM 트리가 정갈한 Markdown 지식으로 재탄생합니다.",
+        "priceTitle": "압도적인 가성비로 AI 파이프라인을 구축하세요",
+        "priceDesc": "불투명한 요금제는 잊으세요. 사용한 만큼만, 업계 최저 수준으로.",
+        "priceTier": "Developer API",
+        "priceStart": "초기 실행 비용 (Actor Start): <strong>$0.01</strong>",
+        "priceData": "데이터 처리 비용: 1,000페이지 당 <strong>$0.50</strong>",
+        "pricePlatform": "플랫폼 이용료: <strong>Free</strong>",
+        "priceCta": "지금 바로 크롤링 시작",
+        "trustBadge": "안전한 결제 지원",
+        "diveTitle": "기술적 심층 분석",
+        "diveDesc": "이 RAG 최적화 API를 어떻게 만들었을까요?",
+        "diveCta": "개발 로그 읽기"
     }
 }

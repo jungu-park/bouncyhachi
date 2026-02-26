@@ -79,15 +79,6 @@ const BlogPost = () => {
                     </div>
                 </header>
 
-                {post.imageUrl && (
-                    <figure className="aspect-[21/9] w-full mb-12 rounded-2xl md:rounded-3xl overflow-hidden bg-slate-100 dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-800">
-                        <img
-                            src={post.imageUrl}
-                            alt={post.name}
-                            className="w-full h-full object-cover"
-                        />
-                    </figure>
-                )}
 
                 <div
                     className="prose prose-lg md:prose-xl dark:prose-invert max-w-none 

@@ -36,5 +36,33 @@
     "terms": "Terms of Service",
     "about": "About Us",
     "contact": "Contact"
+  },
+  "webToMarkdown": {
+    "navBtn": "Get API Key",
+    "heroBadge": "🌟 NEW API RELEASE",
+    "heroTitle": "The ultimate <br><span class=\"gradient-text\">data refining</span> tool for RAG",
+    "heroSub": "Drop the noisy HTML. Convert any webpage into clean, LLM-friendly Markdown in 1 second.",
+    "heroCta": "Start on Apify Store",
+    "featTitle": "Why choose Universal Markdown API?",
+    "featDesc": "Providing an overwhelming pipeline experience to boost LLM performance.",
+    "feat1Title": "Pure Content Extraction",
+    "feat1Desc": "Automatically filters out ads, footers, navigation bars, and noisy elements intelligently to extract pure body content.",
+    "feat2Title": "RAG-Optimized URLs",
+    "feat2Desc": "Perfectly converts all relative paths and image sources to absolute URLs, preventing context and reference House errors in LLMs.",
+    "feat3Title": "Zero-Cost Engine",
+    "feat3Desc": "Achieves extreme parsing speed utilizing Cheerio instead of heavy browsers that consume excess resources. Drastically cuts computing costs.",
+    "compTitle": "The Transformation",
+    "compDesc": "A chaotic DOM tree reborn as refined Markdown knowledge.",
+    "priceTitle": "Build your AI pipeline with unbeatable efficiency",
+    "priceDesc": "Forget opaque pricing. Pay only for what you use, at some of the lowest rates in the industry.",
+    "priceTier": "Developer API",
+    "priceStart": "Actor Start Cost: <strong>$0.01</strong>",
+    "priceData": "Data Processing: <strong>$0.50</strong> per 1,000 pages",
+    "pricePlatform": "Platform Fee: <strong>Free</strong>",
+    "priceCta": "Start Scraping Now",
+    "trustBadge": "Secure Payments Powered by",
+    "diveTitle": "Technical Deep Dive",
+    "diveDesc": "How did I build this RAG-Ready API?",
+    "diveCta": "Read the Devlog"
   }
 }
