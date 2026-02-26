@@ -6,7 +6,8 @@
   --font-display: "Inter", sans-serif;
   --color-primary: #067ff9;
   --color-neon-pink: #ff2e88;
-  --color-background-light: #f5f7f8;
+  --color-background-light: #f1f5f9;
+  /* slate-100 — 부드러운 쿨그레이 */
   --color-background-dark: #0f1923;
 }
 
@@ -38,7 +39,6 @@
 
   .hover-invert:hover {
     background-color: #0f172a;
-    /* slate-900 */
     color: white !important;
     transform: translateY(-4px);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
@@ -52,6 +52,73 @@
   .nav-link-bold {
     @apply font-bold text-slate-900 dark:text-white hover:text-primary transition-all duration-300;
   }
+
+  /* ── Glass Card ── */
+  .glass-card {
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.4s ease, transform 0.4s ease;
+  }
+
+  /* 라이트 모드 글래스 카드 — 반투명 흰 배경 + 부드러운 테두리 */
+  html:not(.dark) .glass-card {
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(203, 213, 225, 0.8);
+    /* slate-300/80 */
+    box-shadow: 0 4px 24px rgba(15, 23, 42, 0.07), 0 1px 4px rgba(15, 23, 42, 0.04);
+  }
+
+  /* 라이트 모드 아이콘 박스 */
+  .light-icon-box {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(203, 213, 225, 0.9);
+  }
+
+  html.dark .light-icon-box {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  /* ── Subpage: Hero Title (gradient text base) ── */
+  .subpage-hero-title {
+    @apply bg-clip-text text-transparent font-black tracking-tight;
+  }
+
+  /* ── Subpage: Glass content wrapper ── */
+  .subpage-glass-wrapper {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 1.5rem;
+    /* rounded-3xl */
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+    padding: 2rem;
+    transition: box-shadow 0.4s ease;
+  }
+
+  html:not(.dark) .subpage-glass-wrapper {
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(203, 213, 225, 0.7);
+    box-shadow: 0 4px 32px rgba(15, 23, 42, 0.06);
+  }
+
+  html.dark .subpage-glass-wrapper {
+    background: rgba(15, 25, 35, 0.55);
+  }
+
+  /* ── Subpage: Item card hover glow base ── */
+  .vibe-item-card {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 0.3s ease,
+      border-color 0.3s ease;
+  }
+
+  .vibe-item-card:hover {
+    transform: translateY(-6px) scale(1.03);
+  }
 }
 
 html.dark {
@@ -61,8 +128,8 @@ html.dark {
 body {
   font-family: var(--font-display);
   background-color: var(--color-background-light);
-  color: #0f172a;
-  /* slate-900 */
+  color: #1e293b;
+  /* slate-800 — 눈이 편한 다크 그레이 */
   min-height: 100vh;
 }
 
