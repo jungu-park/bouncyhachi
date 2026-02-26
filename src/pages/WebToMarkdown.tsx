@@ -300,7 +300,7 @@ const WebToMarkdown: React.FC = () => {
                         <h2 className="section-title">{webT.diveTitle}</h2>
                         <p className="section-desc">{webT.diveDesc}</p>
                         <div className="cta-wrapper">
-                            <a href="/blog/web-to-markdown-devlog" className="cta-button primary-btn shine-effect">
+                            <a href="/blog/JLIgYHpoNA9QWMFAviOB" className="cta-button primary-btn shine-effect">
                                 <span className="btn-text">{webT.diveCta}</span>
                                 <span className="btn-icon">🚀</span>
                             </a>
