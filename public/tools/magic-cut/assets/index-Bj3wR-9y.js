@@ -14,9 +14,9 @@
                 <div class="flex justify-between items-start">
                     <p class="text-sm font-bold text-slate-200 truncate">${t.file.name}</p>
                     ${t.status==="done"?'<span class="material-symbols-outlined text-green-500 text-sm">check_circle</span>':""}
-                    ${t.status==="processing"?`<span class="text-[10px] font-bold text-primary animate-pulse">${r.processing}</span>`:""}
+                    ${t.status==="processing"?`<span class="text-base font-bold text-primary animate-pulse">${r.processing}</span>`:""}
                 </div>
-                <p class="text-[10px] text-slate-500 mt-1 capitalize">${r[t.status]||t.status}</p>
+                <p class="text-sm text-slate-500 mt-1 capitalize">${r[t.status]||t.status}</p>
             </div>
             ${t.status==="done"?`
             <button onclick="downloadSingle('${t.id}')" class="flex size-8 items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 transition-colors" title="Download Image">
