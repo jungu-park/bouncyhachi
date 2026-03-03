@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description"
+        content="Free AI Background Remover. Remove image backgrounds (cutout) safely and quickly in your browser without uploading to a server."
+        id="meta-desc" data-ko="설치 없는 무료 AI 배경 제거 앱. 브라우저 내에서 안전하고 빠르게 이미지의 배경(누끼)을 제거하세요." />
+    <meta name="keywords"
+        content="background remover, remove bg, ai background removal, image editor, transparent background" />
+    <meta property="og:title" content="AI Automatic Background Remover - Magic Cut" id="og-title"
+        data-ko="AI 자동 배경 제거 도구 - Magic Cut" />
+    <meta property="og:description"
+        content="Fast and secure free image background removal using local computing. Supports batch processing of images and folders."
+        id="og-desc" data-ko="로컬 컴퓨팅을 활용한 빠르고 안전한 무료 이미지 배경 제거. 이미지 및 폴더 일괄 처리를 지원합니다." />
+    <meta property="og:type" content="website" />
+    <title id="page-title" data-ko="AI 자동 배경 제거 도구 - Magic Cut">AI Automatic Background Remover - Magic Cut</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+  <script type="module" crossorigin src="./assets/index-DAFDm9PE.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-BOEsrr_E.css">
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden pb-24">
+
+        <!-- Header -->
+        <header
+            class="sticky top-0 z-50 flex items-center justify-between bg-background-dark/80 backdrop-blur-md p-4 border-b border-primary/10">
+            <div class="flex items-center gap-2">
+                <div
+                    class="flex size-10 items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-primary/20">
+                    <span class="material-symbols-outlined">magic_button</span>
+                </div>
+                <div>
+                    <h2 class="text-base font-bold leading-tight tracking-tight text-slate-100 t-content"
+                        data-ko="AI 배경 제거">AI Background Remover</h2>
+                    <p class="text-[10px] text-primary font-semibold uppercase tracking-widest t-content"
+                        data-ko="무료 및 안전 버전">Free & Secure Edition</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <!-- Language Toggle -->
+                <button id="lang-toggle"
+                    class="flex h-9 items-center justify-center rounded-lg bg-surface-dark border border-white/10 px-3 text-xs font-bold text-slate-300 hover:text-white transition-colors gap-2">
+                    <span class="material-symbols-outlined text-sm">language</span>
+                    <span id="lang-text">한글</span>
+                </button>
+                <a href="/"
+                    class="hidden sm:flex h-9 items-center justify-center rounded-lg bg-surface-dark border border-white/5 px-4 text-xs font-bold text-slate-300 hover:text-white transition-colors t-content"
+                    data-ko="홈으로 가기">
+                    Go Home
+                </a>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <main class="flex-1 flex flex-col items-center max-w-4xl mx-auto w-full">
+            <div class="px-4 pt-12 pb-8 text-center">
+                <h1
+                    class="text-4xl sm:text-5xl font-extrabold leading-normal pb-2 text-transparent bg-clip-text bg-gradient-to-r from-slate-100 to-primary/60">
+                    Magic Cut
+                </h1>
+                <p class="mt-4 text-slate-300 text-sm sm:text-base max-w-[550px] mx-auto leading-relaxed t-content"
+                    data-ko="단 1초 만에 깔끔하게 사진 배경을 지워보세요. 서버 전송 없이 로컬에서 바로 처리되어 안전하고 무료입니다.">
+                    Effortlessly remove backgrounds from your photos in seconds.<br />Processed locally on your device
+                    for <strong class="text-primary font-bold">100% privacy and no cost</strong>.
+                </p>
+            </div>
+
+            <!-- Dropzone Section -->
+            <div class="px-4 pb-10 w-full max-w-2xl">
+                <!-- Hidden Input for Files -->
+                <input type="file" id="file-input" multiple accept="image/*" class="hidden" />
+
+                <div id="dropzone"
+                    class="group relative flex flex-col items-center gap-6 rounded-2xl gradient-border bg-surface-dark/40 px-6 py-12 transition-all hover:bg-surface-dark/60 cursor-pointer">
+                    <div class="flex flex-col items-center gap-4 pointer-events-none">
+                        <div
+                            class="flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary ring-4 ring-primary/5 transition-transform group-hover:scale-110">
+                            <span class="material-symbols-outlined text-4xl">cloud_upload</span>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-lg font-bold text-slate-100 t-content" data-ko="이미지 혹은 폴더 업로드 공간">Drop Images
+                                or Folders Here</p>
+                            <p class="mt-2 text-xs text-slate-400 leading-relaxed t-content"
+                                data-ko="이곳에 파일을 드래그 앤 드롭 하거나 클릭하여 선택하세요. (지원 화일: JPG, PNG, WebP)">
+                                Drag and drop files here or click to browse.<br />(Supports JPG, PNG & WebP)
+                            </p>
+                        </div>
+                    </div>
+                    <button type="button"
+                        class="flex w-full sm:w-64 items-center justify-center gap-2 rounded-xl h-12 bg-primary hover:bg-primary/90 text-white text-sm font-bold shadow-xl shadow-primary/20 active:scale-[0.98] transition-transform pointer-events-none t-content"
+                        data-ko="파일 선택하기">
+                        <span class="material-symbols-outlined text-lg">add_photo_alternate</span>
+                        Select Files
+                    </button>
+                </div>
+            </div>
+
+            <!-- Processing Queue -->
+            <div class="px-4 w-full">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-slate-100 t-content" data-ko="작업 대기열">Processing Queue</h3>
+                    <span id="queue-status" class="text-xs font-medium text-primary">0 items</span>
+                </div>
+
+                <div id="processing-list" class="space-y-3 mb-16">
+                    <!-- Empty State -->
+                    <div id="empty-state"
+                        class="text-center py-10 rounded-2xl border border-dashed border-white/10 bg-surface-dark/20 text-slate-500 text-sm t-content"
+                        data-ko="비어 있습니다. 직접 촬영하거나 저장한 이미지를 불러와보세요!">
+                        The queue is empty.<br />Upload images to start magic!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <article class="px-6 py-16 w-full bg-surface-dark/50 border-t border-primary/10">
+                <div class="max-w-3xl mx-auto space-y-16">
+                    <section>
+                        <h2 class="text-2xl font-bold text-slate-100 mb-6 flex items-center gap-2 t-content"
+                            data-ko="마법 같은 AI 배경 제거, 어떻게 쓰나요?">
+                            <span class="material-symbols-outlined text-primary">psychology</span>
+                            Magic AI Background Removal: How It Works
+                        </h2>
+                        <ul class="list-disc list-inside space-y-4 text-slate-300 leading-relaxed text-sm">
+                            <li class="t-content" data-ko="화면 상단의 드롭존을 클릭하여 파일을 선택하거나, 폴더 전체를 드롭 하세요.">Click the
+                                dropzone to <strong>select files</strong> or <strong>drop an entire folder</strong>.
+                            </li>
+                            <li class="t-content" data-ko="업로드 직후 클라우드가 아닌 브라우저에 내장된 AI 모델이 이미지를 즉시 분석합니다.">The built-in
+                                AI model analyzes images directly in your browser, not the cloud.</li>
+                            <li class="t-content" data-ko="피사체와 배경을 완벽히 분리하여 투명 처리된(PNG) 고해상도 품질로 만듭니다.">It separates
+                                the subject from the background, creating high-quality transparent PNGs.</li>
+                            <li class="t-content" data-ko="작업이 완료된 후 개별 다운로드 버튼을 누르거나, 아래 버튼으로 일괄 다운로드하세요.">Download
+                                individual results via the <span
+                                    class="material-symbols-outlined select-none text-base align-middle">download</span>
+                                icon or use <strong>Batch Download (ZIP)</strong>.</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2 class="text-2xl font-bold text-slate-100 mb-6 flex items-center gap-2 t-content"
+                            data-ko="가장 완벽하고 안전한 개인정보 보호 원칙">
+                            <span class="material-symbols-outlined text-primary">shield_lock</span>
+                            The Most Secure & Private Solution
+                        </h2>
+                        <p class="text-slate-300 leading-relaxed text-sm t-content"
+                            data-ko="흔한 배경 제거 앱들이 사용자의 소중한 원본 사진을 외부에 전송하는 데 반해, Magic Cut은 단 한 장의 사진도 인터넷 외부로 내보내지 않습니다. 최신의 On-Device AI 아키텍처를 도입하여 컴퓨터 내부에서 연산이 수행됩니다. 그렇기 때문에 민감한 사진들도 걱정 없이 업로드하여 처리할 수 있습니다. 사용자가 페이지를 닫는 즉시 임시 데이터는 브라우저상에서 곧바로 자연 소각됩니다.">
+                            Unlike typical online background removers that send your private photos to external servers,
+                            <strong>Magic Cut keeps everything on your device.</strong> By using an on-device AI
+                            architecture, processing happens locally. You can handle sensitive photos or private designs
+                            without any privacy concerns. It's completely free, and all temporary data is instantly
+                            wiped from the browser as soon as you close the page.
+                        </p>
+                    </section>
+                </div>
+            </article>
+        </main>
+
+        <!-- Footer -->
+        <footer class="w-full bg-background-dark py-12 px-4 border-t border-white/5 mt-auto">
+            <div class="max-w-4xl mx-auto text-center flex flex-col items-center">
+                <p class="text-xs text-slate-500 max-w-2xl mx-auto mb-6 leading-relaxed t-content"
+                    data-ko="개인정보처리방침 (Privacy Policy) & 서비스 안내: bouncyhachi.com에서 제공하는 AI Background Remover 서비스는 100% 클라이언트 로컬 방식의 애플리케이션입니다. 사용자의 IP를 기록하거나 이미지 파일을 수집·보관·제3자 공유하지 않습니다. 본 서비스에 업로드하시는 이미지는 온전히 사용자 기기 안에만 머무르며 안전히 처리됩니다.">
+                    <strong>Privacy Policy & Service Information:</strong><br>
+                    The AI Background Remover service on bouncyhachi.com is a 100% client-side application. We do not
+                    record your IP address or collect, store, or share your images. All processing is strictly local to
+                    your device, ensuring total security for your uploaded assets.
+                </p>
+                <p class="text-slate-600 text-[10px] uppercase font-bold tracking-widest mt-4">
+                    © 2026 BOUNCYHACHI.COM. All rights reserved.
+                </p>
+            </div>
+        </footer>
+
+        <!-- Action Bar (Floating) -->
+        <div id="action-bar"
+            class="fixed bottom-6 left-4 right-4 z-40 transition-transform translate-y-32 opacity-0 duration-300">
+            <div class="flex items-center justify-between glass-panel p-4 rounded-2xl shadow-2xl border-white/10">
+                <div class="flex gap-2 items-center">
+                    <div
+                        class="flex items-center justify-center rounded-lg bg-surface-dark px-4 py-2 font-bold text-white ring-1 ring-white/10 shadow-inner">
+                        <span id="ready-count" class="text-primary text-xl mr-2">0</span>
+                        <span class="text-[10px] text-slate-400 uppercase tracking-widest mt-1 t-content"
+                            data-ko="완료 (Ready)">Ready</span>
+                    </div>
+                </div>
+                <button id="download-zip-btn"
+                    class="flex items-center gap-2 rounded-xl h-12 px-6 bg-primary hover:bg-primary/80 transition-colors text-white text-sm font-bold shadow-lg shadow-primary/30 active:scale-95 t-content"
+                    data-ko="일괄 다운로드 (ZIP)">
+                    <span class="material-symbols-outlined">folder_zip</span>
+                    Batch Download (ZIP)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+</body>
+
+</html>
