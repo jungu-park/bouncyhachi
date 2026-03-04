@@ -78,6 +78,18 @@ const Admin = () => {
         }
     }, [isAdmin]);
 
+    useEffect(() => {
+        if (items.length > 0) {
+            const reviewBooster = items.find(item => item.name === 'ReviewBooster' || item.name === 'Review Booster');
+            if (reviewBooster && (!reviewBooster.linkUrl || reviewBooster.linkUrl === '#')) {
+                console.log('Auto-fixing Review Booster linkUrl...');
+                updateItem(reviewBooster.id!, { linkUrl: '/ReviewBooster/' }).then(() => {
+                    fetchItems();
+                });
+            }
+        }
+    }, [items]);
+
     const fetchItems = async () => {
         setLoading(true);
         try {
