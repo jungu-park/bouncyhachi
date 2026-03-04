@@ -13,7 +13,7 @@ export default defineConfig({
       name: 'serve-static-html',
       configureServer(server) {
         server.middlewares.use((req, res, next) => {
-          if (req.url && (req.url.startsWith('/tools/') || req.url.startsWith('/games/') || req.url.startsWith('/fortune/')) && !req.url.includes('.')) {
+          if (req.url && (req.url.startsWith('/tools/') || req.url.startsWith('/games/') || req.url.startsWith('/fortune/') || req.url.startsWith('/ReviewBooster/')) && !req.url.includes('.')) {
             if (!req.url.endsWith('/')) {
               res.writeHead(301, { Location: req.url + '/' })
               res.end()

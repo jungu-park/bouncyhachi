@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ReviewBooster Web Dashboard Overview</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1132d4",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101322",
+                        "surface": "#1a1f35",
+                        "border-subtle": "#2e375d",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+        .glass {
+            background: rgba(26, 31, 53, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar (Hidden on mobile, showing as a drawer-like simulation for "ios phone" factor as requested but with sidebar content) -->
+<aside class="hidden md:flex w-64 flex-col bg-surface/50 border-r border-border-subtle glass">
+<div class="p-6">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-3xl font-bold">rocket_launch</span>
+<span class="text-xl font-extrabold tracking-tight">ReviewBooster</span>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 bg-primary text-white rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-semibold">Overview</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">inbox</span>
+<span class="font-medium">Reviews Inbox</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">settings_suggest</span>
+<span class="font-medium">AI Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-medium">Billing</span>
+</a>
+</nav>
+<div class="p-4 border-t border-border-subtle">
+<div class="flex items-center gap-3 p-2">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">JD</div>
+<div class="overflow-hidden">
+<p class="text-sm font-bold truncate">John's Diner</p>
+<p class="text-xs text-slate-500 truncate">Premium Plan</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col overflow-y-auto">
+<!-- Header -->
+<header class="sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-background-dark/80 backdrop-blur-md border-b border-border-subtle">
+<div class="flex items-center gap-4">
+<button class="md:hidden text-slate-100">
+<span class="material-symbols-outlined text-2xl">menu</span>
+</button>
+<h1 class="text-xl font-bold">Dashboard</h1>
+</div>
+<div class="flex items-center gap-3">
+<button class="relative p-2 text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+</button>
+</div>
+</header>
+<!-- Metrics Section -->
+<section class="p-6 space-y-6">
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+<!-- Metric Card 1 -->
+<div class="bg-surface border border-border-subtle p-5 rounded-xl shadow-lg relative overflow-hidden group">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-slate-400 text-sm font-medium">Reviews Handled</p>
+<h3 class="text-3xl font-bold mt-1">124</h3>
+</div>
+<div class="bg-primary/10 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary">auto_awesome</span>
+</div>
+</div>
+<div class="mt-4 flex items-center gap-2">
+<span class="text-emerald-500 text-sm font-bold flex items-center">
+<span class="material-symbols-outlined text-sm">trending_up</span> +15%
+                            </span>
+<span class="text-slate-500 text-xs">vs last week</span>
+</div>
+</div>
+<!-- Metric Card 2 -->
+<div class="bg-surface border border-border-subtle p-5 rounded-xl shadow-lg relative overflow-hidden group">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-slate-400 text-sm font-medium">Average Rating</p>
+<h3 class="text-3xl font-bold mt-1">4.8 <span class="text-lg font-normal text-slate-500">/ 5</span></h3>
+</div>
+<div class="bg-amber-500/10 p-2 rounded-lg">
+<span class="material-symbols-outlined text-amber-500">star</span>
+</div>
+</div>
+<div class="mt-4 flex items-center gap-2">
+<span class="text-emerald-500 text-sm font-bold flex items-center">
+<span class="material-symbols-outlined text-sm">add</span> 0.2
+                            </span>
+<span class="text-slate-500 text-xs">improvement</span>
+</div>
+</div>
+<!-- Metric Card 3 -->
+<div class="bg-surface border border-border-subtle p-5 rounded-xl shadow-lg relative overflow-hidden group">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-slate-400 text-sm font-medium">Time Saved</p>
+<h3 class="text-3xl font-bold mt-1">12h 45m</h3>
+</div>
+<div class="bg-purple-500/10 p-2 rounded-lg">
+<span class="material-symbols-outlined text-purple-500">bolt</span>
+</div>
+</div>
+<div class="mt-4 flex items-center gap-2">
+<span class="text-emerald-500 text-sm font-bold flex items-center">
+<span class="material-symbols-outlined text-sm">trending_up</span> 3h
+                            </span>
+<span class="text-slate-500 text-xs">this week</span>
+</div>
+</div>
+</div>
+<!-- Review Inbox Title -->
+<div class="flex items-center justify-between pt-4">
+<h2 class="text-xl font-bold tracking-tight">Recent Reviews</h2>
+<button class="text-primary text-sm font-semibold hover:underline">View All</button>
+</div>
+<!-- Reviews List -->
+<div class="space-y-4 pb-24">
+<!-- Review Item 1: Pending -->
+<div class="bg-surface border border-border-subtle rounded-xl p-5 shadow-sm">
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center text-white">
+<span class="material-symbols-outlined">restaurant</span>
+</div>
+<div>
+<p class="font-bold">Kim Min-su</p>
+<p class="text-xs text-slate-500">Baedal Minjok • 2 mins ago</p>
+</div>
+</div>
+<div class="flex text-amber-500">
+<span class="material-symbols-outlined text-lg fill-1">star</span>
+<span class="material-symbols-outlined text-lg fill-1">star</span>
+<span class="material-symbols-outlined text-lg fill-1">star</span>
+<span class="material-symbols-outlined text-lg fill-1">star</span>
+<span class="material-symbols-outlined text-lg fill-1">star</span>
+</div>
+</div>
+<p class="text-slate-300 text-sm mb-4 leading-relaxed">
+                            The food was absolutely delicious and arrived much faster than expected! The packaging was very neat too. Highly recommended for everyone.
+                        </p>
+<button class="w-full py-3 bg-primary hover:bg-primary/90 text-white rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">auto_fix_high</span>
+                            Generate AI Reply
+                        </button>
+</div>
+<!-- Review Item 2: Processed / AI Drafted -->
+<div class="bg-surface border border-border-subtle rounded-xl p-5 shadow-sm border-l-4 border-l-primary">
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-emerald-500 flex items-center justify-center text-white">
+<span class="material-symbols-outlined">google</span>
+</div>
+<div>
+<p class="font-bold">Sarah Jenkins</p>
+<p class="text-xs text-slate-500">Google Maps • 1 hour ago</p>
+</div>
+</div>
+<div class="flex text-amber-500">
+<span class="material-symbols-outlined text-lg fill-1">star</span>
+<span class="material-symbols-outlined text-lg fill-1">star</span>
+<span class="material-symbols-outlined text-lg fill-1">star</span>
+<span class="material-symbols-outlined text-lg fill-1">star</span>
+<span class="material-symbols-outlined text-lg">star_half</span>
+</div>
+</div>
+<p class="text-slate-300 text-sm mb-4 italic">
+                            "Great vibe and friendly staff. The pasta was a bit salty but the appetizers were perfect."
+                        </p>
+<!-- AI Draft Area -->
+<div class="glass rounded-lg p-4 mb-4 border border-primary/30">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary text-sm">smart_toy</span>
+<span class="text-xs font-bold uppercase tracking-wider text-primary">AI Draft</span>
+</div>
+<p class="text-sm text-slate-200 leading-relaxed">
+                                Dear Sarah, thank you for visiting John's Diner! We're glad you enjoyed the vibe and appetizers. We appreciate your feedback on the pasta and will share it with our chef to ensure we're delivering perfection. Hope to see you again soon!
+                            </p>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 py-2.5 bg-primary text-white rounded-lg font-bold text-sm">Publish Reply</button>
+<button class="flex-1 py-2.5 bg-transparent border border-border-subtle text-slate-300 rounded-lg font-bold text-sm">Edit</button>
+</div>
+</div>
+<!-- Review Item 3 -->
+<div class="bg-surface border border-border-subtle rounded-xl p-5 shadow-sm opacity-60">
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-red-500 flex items-center justify-center text-white">
+<span class="material-symbols-outlined">shopping_bag</span>
+</div>
+<div>
+<p class="font-bold">David Chen</p>
+<p class="text-xs text-slate-500">Yelp • 3 hours ago</p>
+</div>
+</div>
+<div class="flex text-amber-500">
+<span class="material-symbols-outlined text-lg fill-1">star</span>
+<span class="material-symbols-outlined text-lg fill-1">star</span>
+<span class="material-symbols-outlined text-lg fill-1">star</span>
+<span class="material-symbols-outlined text-lg">star</span>
+<span class="material-symbols-outlined text-lg">star</span>
+</div>
+</div>
+<p class="text-slate-300 text-sm">Best burger in town. Will definitely order again.</p>
+<div class="mt-4 flex items-center gap-2 text-emerald-400 text-xs font-bold">
+<span class="material-symbols-outlined text-xs">check_circle</span>
+                            Replied automatically
+                        </div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar (Mobile only simulation) -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around bg-surface border-t border-border-subtle px-4 pb-6 pt-3 glass">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-1">dashboard</span>
+<span class="text-[10px] font-bold">Overview</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">inbox</span>
+<span class="text-[10px] font-medium">Inbox</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="text-[10px] font-medium">AI Agent</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">credit_card</span>
+<span class="text-[10px] font-medium">Billing</span>
+</a>
+</nav>
+</div>
+</body></html>
