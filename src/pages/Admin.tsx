@@ -81,9 +81,9 @@ const Admin = () => {
     useEffect(() => {
         if (items.length > 0) {
             const reviewBooster = items.find(item => item.name === 'ReviewBooster' || item.name === 'Review Booster');
-            if (reviewBooster && (!reviewBooster.linkUrl || reviewBooster.linkUrl === '#')) {
+            if (reviewBooster && (!reviewBooster.linkUrl || reviewBooster.linkUrl === '#' || reviewBooster.linkUrl === '/ReviewBooster/')) {
                 console.log('Auto-fixing Review Booster linkUrl...');
-                updateItem(reviewBooster.id!, { linkUrl: '/ReviewBooster/' }).then(() => {
+                updateItem(reviewBooster.id!, { linkUrl: '/tools/ReviewBooster/' }).then(() => {
                     fetchItems();
                 });
             }
