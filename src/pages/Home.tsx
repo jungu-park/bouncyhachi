@@ -3,8 +3,8 @@ import { Sparkles, Wrench, Gamepad2, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import ParticleBackground from '../components/ui/ParticleBackground';
+import SEO from '../components/SEO';
 
-const MotionLink = motion.create(Link);
 
 interface Card {
     to: string;
@@ -18,11 +18,11 @@ interface Card {
 }
 
 const Home = () => {
-    const { t } = useLanguage();
+    const { t, lang } = useLanguage();
 
     const cards: Card[] = [
         {
-            to: '/blog',
+            to: `/${lang}/blog`,
             title: t.cards.blog.title,
             desc: t.cards.blog.desc,
             icon: <Sparkles className="w-7 h-7" />,
@@ -32,7 +32,7 @@ const Home = () => {
             gradientTo: 'rgba(6,127,249,0)',
         },
         {
-            to: '/tools',
+            to: `/${lang}/tools`,
             title: t.cards.tools.title,
             desc: t.cards.tools.desc,
             icon: <Wrench className="w-7 h-7" />,
@@ -42,7 +42,7 @@ const Home = () => {
             gradientTo: 'rgba(255,46,136,0)',
         },
         {
-            to: '/arcade',
+            to: `/${lang}/arcade`,
             title: t.cards.games.title,
             desc: t.cards.games.desc,
             icon: <Gamepad2 className="w-7 h-7" />,
@@ -52,7 +52,7 @@ const Home = () => {
             gradientTo: 'rgba(34,197,94,0)',
         },
         {
-            to: '/fortune',
+            to: `/${lang}/fortune`,
             title: t.cards.fortune.title,
             desc: t.cards.fortune.desc,
             icon: <Star className="w-7 h-7" />,
@@ -65,7 +65,7 @@ const Home = () => {
 
     const containerVariants = {
         hidden: {},
-        visible: { transition: { staggerChildren: 0.12 } },
+        visible: { transition: { staggerChildren: 0.05 } },
     };
 
     const cardVariants = {
@@ -74,7 +74,18 @@ const Home = () => {
     };
 
     return (
-        <div className="relative min-h-screen">
+        <main className="relative min-h-screen">
+            <SEO
+                title="바운시하치 (BouncyHachi) - 종합 유틸리티 및 무설치 웹 엔터테인먼트 플랫폼"
+                description="바운시하치는 무료로 제공되는 다양한 웹 툴, 무설치 HTML5 아케이드 게임, 매일 확인하는 오늘의 운세, 그리고 유익한 블로그 포스팅을 한곳에 모은 종합 엔터테인먼트 플랫폼입니다. 별도의 다운로드 없이 브라우저에서 바로 즐겨보세요."
+                schema={{
+                    "@context": "https://schema.org",
+                    "@type": "WebSite",
+                    "name": "BouncyHachi",
+                    "url": "https://bouncyhachi.com/",
+                    "description": "바운시하치는 무료로 제공되는 다양한 웹 툴, 무설치 HTML5 아케이드 게임, 매일 확인하는 오늘의 운세, 그리고 유익한 블로그 포스팅을 한곳에 모은 종합 엔터테인먼트 플랫폼입니다."
+                }}
+            />
             {/* Three.js particle layer */}
             <ParticleBackground />
 
@@ -105,6 +116,21 @@ const Home = () => {
                     <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto mb-12 leading-relaxed font-medium">
                         {t.home.subtitle}
                     </p>
+
+                    {/* SEO / AdSense Content Text */}
+                    <article className="prose dark:prose-invert max-w-4xl mx-auto mb-12 text-left text-slate-500 dark:text-slate-400">
+                        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-4">{t.home.introTitle}</h2>
+                        <p className="mb-4">
+                            {t.home.introP1}
+                        </p>
+                        <p className="mb-4">
+                            {t.home.introP2}
+                        </p>
+                        <p>
+                            {t.home.introP3}
+                        </p>
+                    </article>
+
                     <motion.div
                         whileHover={{ scale: 1.05, y: -3 }}
                         whileTap={{ scale: 0.97 }}
@@ -112,7 +138,7 @@ const Home = () => {
                         className="inline-block"
                     >
                         <Link
-                            to="/blog"
+                            to={`/${lang}/blog`}
                             className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl font-black text-lg text-white transition-all duration-300"
                             style={{
                                 background: 'linear-gradient(135deg, #067ff9, #9333ea)',
@@ -134,64 +160,65 @@ const Home = () => {
                 >
                     {cards.map((card) => (
                         <motion.div key={card.to} variants={cardVariants}>
-                            <MotionLink
-                                to={card.to}
-                                className="glass-card flex flex-col p-9 rounded-3xl relative overflow-hidden group block"
-                                whileHover={{ y: -8, scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-                                style={{
-                                    backdropFilter: 'blur(18px)',
-                                    WebkitBackdropFilter: 'blur(18px)',
-                                }}
-                            >
-                                {/* Radial glow overlay — appears on hover */}
-                                <div
-                                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-3xl"
+                            <Link to={card.to} className="block w-full h-full outline-none group">
+                                <motion.div
+                                    className="glass-card flex flex-col p-9 rounded-3xl relative overflow-hidden h-full cursor-pointer"
+                                    whileHover={{ y: -8, scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    transition={{ type: 'spring', stiffness: 300, damping: 22 }}
                                     style={{
-                                        background: `radial-gradient(circle at 30% 40%, ${card.gradientFrom} 0%, ${card.gradientTo} 70%)`,
-                                    }}
-                                />
-                                {/* Top border accent */}
-                                <div
-                                    className="absolute top-0 left-8 right-8 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                                    style={{ background: `linear-gradient(90deg, transparent, ${card.accent}, transparent)` }}
-                                />
-
-                                {/* Icon */}
-                                <div
-                                    className="light-icon-box mb-7 p-4 rounded-2xl inline-flex items-center justify-center w-14 h-14 transition-all duration-500 group-hover:scale-110 relative z-10"
-                                    style={{
-                                        color: card.accent,
-                                        boxShadow: `0 0 20px ${card.glowColor}`,
+                                        backdropFilter: 'blur(18px)',
+                                        WebkitBackdropFilter: 'blur(18px)',
                                     }}
                                 >
-                                    {card.icon}
-                                </div>
+                                    {/* Radial glow overlay — appears on hover */}
+                                    <div
+                                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-3xl"
+                                        style={{
+                                            background: `radial-gradient(circle at 30% 40%, ${card.gradientFrom} 0%, ${card.gradientTo} 70%)`,
+                                        }}
+                                    />
+                                    {/* Top border accent */}
+                                    <div
+                                        className="absolute top-0 left-8 right-8 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                                        style={{ background: `linear-gradient(90deg, transparent, ${card.accent}, transparent)` }}
+                                    />
 
-                                <h3
-                                    className="text-3xl font-black mb-3 relative z-10 tracking-tight text-slate-800 dark:text-white group-hover:text-white transition-colors duration-300"
-                                >
-                                    {card.title}
-                                </h3>
-                                <p className="text-slate-500 dark:text-slate-400 text-base font-medium leading-relaxed relative z-10 group-hover:text-slate-300 transition-colors duration-300">
-                                    {card.desc}
-                                </p>
+                                    {/* Icon */}
+                                    <div
+                                        className="light-icon-box mb-7 p-4 rounded-2xl inline-flex items-center justify-center w-14 h-14 relative z-10 pointer-events-none"
+                                        style={{
+                                            color: card.accent,
+                                            boxShadow: `0 0 20px ${card.glowColor}`,
+                                        }}
+                                    >
+                                        {card.icon}
+                                    </div>
 
-                                {/* Arrow */}
-                                <div
-                                    className="mt-6 flex items-center gap-2 text-sm font-semibold relative z-10 opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-400"
-                                    style={{ color: card.accent }}
-                                >
-                                    <span>Explore</span>
-                                    <span>→</span>
-                                </div>
-                            </MotionLink>
+                                    <h3
+                                        className="text-3xl font-black mb-3 relative z-10 tracking-tight text-slate-800 dark:text-white group-hover:text-white transition-colors duration-300 pointer-events-none"
+                                    >
+                                        {card.title}
+                                    </h3>
+                                    <p className="text-slate-500 dark:text-slate-400 text-base font-medium leading-relaxed relative z-10 group-hover:text-slate-300 transition-colors duration-300 pointer-events-none">
+                                        {card.desc}
+                                    </p>
+
+                                    {/* Arrow */}
+                                    <div
+                                        className="mt-6 flex items-center gap-2 text-sm font-semibold relative z-10 opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-400 pointer-events-none"
+                                        style={{ color: card.accent }}
+                                    >
+                                        <span>Explore</span>
+                                        <span>→</span>
+                                    </div>
+                                </motion.div>
+                            </Link>
                         </motion.div>
                     ))}
                 </motion.section>
             </div>
-        </div>
+        </main>
     );
 };
 

@@ -1,0 +1,10 @@
+name = "hachi-gdocs-importer"
+main = "scripts/google_docs_worker.js"
+compatibility_date = "2024-03-01"
+
+[vars]
+R2_PUBLIC_DOMAIN = "https://pub-47a8242cca8645aaa67f3abeef516c23.r2.dev"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "bouncyhachi"

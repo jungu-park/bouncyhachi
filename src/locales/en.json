@@ -10,7 +10,11 @@
   "home": {
     "title": "Welcome to BouncyHachi",
     "subtitle": "Dive into the vibrant portal for coding vibes, tools, and fun.",
-    "explore": "Explore Now"
+    "explore": "Explore Now",
+    "introTitle": "Welcome to BouncyHachi!",
+    "introP1": "BouncyHachi is a web-based **multi-utility and entertainment hub** created to enrich the digital lives of modern people. We provide powerful tools and fun activities that can be used immediately in the web browser without complex installation or cumbersome membership registration.",
+    "introP2": "From smart **Web Tools** that increase daily work productivity, to **light HTML5 arcade games** that can blow away stress during a short break, to interesting **fortune-telling services** that give a glimpse into the future, a variety of content is updated in real time.",
+    "introP3": "It features a responsive interface (UI) optimized for both mobile and desktop environments, and has an intuitive design with users' convenience as the top priority. Just connect to the web anytime, anywhere, check useful information and IT tips on the blog, and experience various convenient features. BouncyHachi aims to be an AI-based creative hub that awakens your creativity and brings small joy to your daily life."
   },
   "cards": {
     "blog": {

@@ -4,8 +4,12 @@ import { collection, getDocs, getDoc, addDoc, updateDoc, deleteDoc, doc, Timesta
 export interface VibeItem {
     id?: string;
     name: string;
+    name_ko?: string;
+    name_en?: string;
     category: 'Blog' | 'Tools' | 'Games' | 'Fortune' | 'Promotion';
     description?: string;
+    description_ko?: string;
+    description_en?: string;
     imageUrl?: string;
     linkUrl?: string; // For games or tools
     createdAt: Timestamp;

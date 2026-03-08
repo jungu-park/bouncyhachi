@@ -3,6 +3,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { Wrench, ExternalLink } from 'lucide-react';
 import { getItems, type VibeItem } from '../lib/crud';
 import { motion } from 'framer-motion';
+import SEO from '../components/SEO';
 
 const Tools = () => {
     const { t } = useLanguage();
@@ -16,7 +17,18 @@ const Tools = () => {
     }, []);
 
     return (
-        <div className="flex flex-col items-center justify-start py-24 px-4 w-full max-w-6xl mx-auto">
+        <main className="flex flex-col items-center justify-start py-24 px-4 w-full max-w-6xl mx-auto">
+            <SEO
+                title={`${t.cards.tools.title} - 바운시하치 (BouncyHachi) 스마트 웹 툴`}
+                description="일상적인 업무와 온라인 활동의 효율성을 극대화하는 다양한 무료 웹 툴을 만나보세요. 이미지 최적화, 텍스트 변환기, 보안 기능 등 번거로운 설치 과정 없이 웹상에서 바로 실행 가능한 스마트 도구들이 준비되어 있습니다."
+                schema={{
+                    "@context": "https://schema.org",
+                    "@type": "CollectionPage",
+                    "name": "바운시하치 웹 툴스",
+                    "description": "일상적인 업무와 온라인 활동의 효율성을 극대화하는 다양한 무료 웹 툴",
+                    "url": "https://bouncyhachi.com/tools"
+                }}
+            />
             {/* ── Hero Section ── */}
             <motion.div
                 className="text-center mb-16"
@@ -50,13 +62,22 @@ const Tools = () => {
                 </motion.h1>
 
                 <motion.p
-                    className="text-lg text-slate-500 dark:text-slate-400 max-w-lg mx-auto"
+                    className="text-lg text-slate-500 dark:text-slate-400 max-w-lg mx-auto mb-8"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.25, duration: 0.5 }}
                 >
                     {t.cards.tools.desc}
                 </motion.p>
+
+                {/* SEO Text Content */}
+                <article className="prose prose-sm dark:prose-invert max-w-2xl mx-auto text-center text-slate-500 dark:text-slate-400">
+                    <p>
+                        바운시하치 웹 툴스(Web Tools)는 사용자 여러분의 소중한 시간과 노력을 절약해주는 생산성 솔루션입니다.
+                        번거로운 소프트웨어 설치나 복잡한 설정 없이, 클릭 몇 번만으로 텍스트 처리, 개발 지원, 이미지 변환 등 다양한 작업을 직관적으로 수행할 수 있습니다.
+                        브라우저 하나로 일상의 단순 작업을 빠르고 스마트하게 해결하는 최고의 경험을 누려보세요.
+                    </p>
+                </article>
             </motion.div>
 
             {/* ── Content Glass Wrapper ── */}
@@ -113,7 +134,7 @@ const Tools = () => {
                     </div>
                 )}
             </motion.div>
-        </div>
+        </main>
     );
 };
 

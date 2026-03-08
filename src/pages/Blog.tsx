@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const Blog = () => {
-    const { t } = useLanguage();
+    const { t, lang } = useLanguage();
     const [posts, setPosts] = useState<VibeItem[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -81,7 +81,7 @@ const Blog = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {posts.map(post => (
                             <Link
-                                to={`/blog/${post.id}`}
+                                to={`/${lang}/blog/${post.id}`}
                                 key={post.id}
                                 className="vibe-item-card group bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-sm flex flex-col block"
                                 style={{ '--glow': 'rgba(6,127,249,0.35)' } as React.CSSProperties}
@@ -103,7 +103,7 @@ const Blog = () => {
                                 </div>
                                 <div className="p-6 flex flex-col flex-1">
                                     <h2 className="text-xl font-bold mb-2 text-slate-800 dark:text-white line-clamp-2 group-hover:text-primary transition-colors">
-                                        {post.name}
+                                        {lang === 'ko' ? (post.name_ko || post.name) : (post.name_en || post.name)}
                                     </h2>
                                     <div className="text-sm text-slate-400 mb-4 mt-auto pt-4 flex items-center justify-between">
                                         <span>{post.createdAt?.toDate().toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>

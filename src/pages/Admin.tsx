@@ -6,11 +6,36 @@ import { collection, query, where, getDocs, setDoc, doc, deleteDoc, onSnapshot }
 import { getItems, addItem, updateItem, deleteItem, type VibeItem } from '../lib/crud';
 import { compressAndUploadImage } from '../lib/r2';
 import * as mammoth from 'mammoth';
-import TurndownService from 'turndown';
 import {
     LayoutDashboard, FileText, Wrench, Gamepad2, Star,
     LogOut, Plus, Edit, Trash2, Sparkles, X, Image as ImageIcon, Users, FileUp
 } from 'lucide-react';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
+
+// Custom modules for Quill to maintain formatting better on paste
+const quillModules = {
+    toolbar: [
+        [{ 'header': [1, 2, 3, false] }],
+        [{ 'size': ['small', false, 'large', 'huge'] }],
+        ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
+        [{ 'color': [] }, { 'background': [] }],
+        ['link', 'image'],
+        ['clean']
+    ],
+    clipboard: {
+        matchVisual: false,
+    }
+};
+
+const quillFormats = [
+    'header', 'size',
+    'bold', 'italic', 'underline', 'strike', 'blockquote',
+    'list', 'bullet', 'indent',
+    'color', 'background',
+    'link', 'image'
+];
 
 const Admin = () => {
     const { user } = useAuth();
@@ -34,6 +59,8 @@ const Admin = () => {
     const [isUploadingInline, setIsUploadingInline] = useState(false);
     const [isImportingDocx, setIsImportingDocx] = useState(false);
     const [docxProgress, setDocxProgress] = useState('');
+    const [googleDocId, setGoogleDocId] = useState('');
+    const [isImportingGDoc, setIsImportingGDoc] = useState(false);
 
     const tabs = [
         { name: 'Overview', icon: <LayoutDashboard size={20} />, color: 'text-primary' },
@@ -142,36 +169,52 @@ const Admin = () => {
             const result = await mammoth.convertToHtml({ arrayBuffer }, options);
             const html = result.value;
 
-            setDocxProgress('Converting format...');
-            const turndownService = new TurndownService({ headingStyle: 'atx' });
-            let markdown = turndownService.turndown(html);
+            setDocxProgress('Processing content...');
+            // In Rich Text mode, we keep the HTML instead of converting to Markdown
+            let contentHtml = html;
 
             let title = selectedFile.name.replace(/\.[^/.]+$/, "");
-            const lines = markdown.split('\n');
-            const firstNonEmptyLineIndex = lines.findIndex((line: string) => line.trim().length > 0);
 
-            if (firstNonEmptyLineIndex !== -1) {
-                const firstLine = lines[firstNonEmptyLineIndex].trim();
-                // If it looks like a heading, use it as title and remove it
-                if (firstLine.startsWith('# ') || firstLine.startsWith('## ')) {
-                    title = firstLine.replace(/^#+\s*/, '').trim();
-                    lines.splice(firstNonEmptyLineIndex, 1);
-                    markdown = lines.join('\n').trim();
-                } else if (firstLine.replace(/\*/g, '').trim().length > 0 && firstLine.length < 50) {
-                    // Fallback, maybe the first line is simply strong or just text
-                    title = firstLine.replace(/\*/g, '').trim();
-                    lines.splice(firstNonEmptyLineIndex, 1);
-                    markdown = lines.join('\n').trim();
+            // Improved title extraction from HTML
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            // Try to find the most likely title (H1, then H2, then first strong/bold if at top)
+            const h1 = doc.querySelector('h1, h2');
+            if (h1 && h1.textContent?.trim()) {
+                const headerText = h1.textContent.trim();
+                // If it's the first element, it's very likely the title
+                if (doc.body.firstElementChild === h1) {
+                    title = headerText;
+                    h1.remove();
+                } else if (headerText.length > 5 && headerText.length < 100) {
+                    title = headerText;
+                    h1.remove();
+                }
+            } else {
+                // If no H1/H2, check if first paragraph is emphasized
+                const firstP = doc.body.firstElementChild;
+                if (firstP && (firstP.tagName === 'P' || firstP.tagName === 'DIV')) {
+                    const text = firstP.textContent?.trim() || '';
+                    if (text && text.length > 5 && text.length < 100) { // Likely a title if short and at top
+                        title = text;
+                        firstP.remove();
+                    }
                 }
             }
+            contentHtml = doc.body.innerHTML;
 
-            console.log('Docx import successful:', { title, markdownLength: markdown.length, firstImageUrl });
+            console.log('Docx import successful (HTML mode):', { title, htmlLength: contentHtml.length, firstImageUrl });
             // Pre-fill modal
             setEditingItem(null);
             setForm({
                 name: title,
+                name_ko: title,
+                name_en: '',
                 category: activeTab !== 'Overview' && activeTab !== 'Admins' ? activeTab as any : 'Blog',
-                description: markdown,
+                description: contentHtml,
+                description_ko: contentHtml,
+                description_en: '',
                 imageUrl: firstImageUrl,
             });
             setFile(null);
@@ -187,16 +230,137 @@ const Admin = () => {
         }
     };
 
+    const handleImportGoogleDoc = async (lang: 'ko' | 'en' = 'ko') => {
+        let docId = googleDocId.trim();
+        if (!docId) {
+            alert('Please enter a Google Doc ID or URL');
+            return;
+        }
+
+        // Extract ID from URL if full URL is pasted
+        if (docId.includes('docs.google.com/document/d/')) {
+            const match = docId.match(/\/document\/d\/([a-zA-Z0-9_-]+)/);
+            if (match && match[1]) {
+                docId = match[1];
+            }
+        }
+
+        try {
+            setIsImportingGDoc(true);
+            // This is the URL of your deployed Cloudflare Worker
+            const WORKER_URL = import.meta.env.VITE_GDOCS_WORKER_URL || 'http://localhost:8787';
+
+
+            const response = await fetch(WORKER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ docId })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || data.error) {
+                throw new Error(data.error || 'Failed to import from Google Docs');
+            }
+
+            let { html, title } = data;
+
+            // Merging with existing form fields
+            setForm(prev => ({
+                ...prev,
+                [`name_${lang}`]: title,
+                [`description_${lang}`]: html,
+                // Also update generic fields for backward compatibility if they aren't set
+                name: prev.name || (lang === 'ko' ? title : prev.name),
+                description: lang === 'ko' ? html : prev.description,
+                category: prev.category || (activeTab !== 'Overview' && activeTab !== 'Admins' ? activeTab as any : 'Blog'),
+            }));
+
+            if (!isModalOpen) setIsModalOpen(true);
+            setGoogleDocId(''); // Success, clear ID
+
+        } catch (err) {
+            console.error('Failed to import Google Doc:', err);
+            alert(`Failed to import Google Doc: ${err instanceof Error ? err.message : String(err)}`);
+        } finally {
+            setIsImportingGDoc(false);
+        }
+    };
+
+    const extractTitleFromContent = (field: 'description' | 'description_ko' | 'description_en') => {
+        const html = (form as any)[field];
+        if (!html) return;
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        // Find H1, H2, or first P
+        const firstEl = doc.body.querySelector('h1, h2, p, div');
+
+        if (firstEl) {
+            const text = firstEl.textContent?.trim();
+            if (text) {
+                const lang = field.includes('_ko') ? 'ko' : field.includes('_en') ? 'en' : 'ko';
+                const titleField = `name_${lang}`;
+
+                if (confirm(`Extract "${text}" as the title (${lang.toUpperCase()})?`)) {
+                    setForm(prev => ({
+                        ...prev,
+                        [titleField]: text,
+                        // Also update generic name if matches language
+                        name: lang === 'ko' ? text : prev.name || text
+                    }));
+                }
+            } else {
+                alert('No text found in the first element.');
+            }
+        } else {
+            alert('No elements found in content.');
+        }
+    };
+
+    const stripTitleFromContent = (field: 'description' | 'description_ko' | 'description_en') => {
+        const html = (form as any)[field];
+        if (!html) return;
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const firstEl = doc.body.firstElementChild;
+
+        if (firstEl && (firstEl.tagName.startsWith('H') || firstEl.tagName === 'P')) {
+            const strippedText = firstEl.textContent?.trim();
+            if (confirm(`Remove "${strippedText}" from the top of content?`)) {
+                firstEl.remove();
+                setForm(prev => ({ ...prev, [field]: doc.body.innerHTML }));
+            }
+        } else {
+            alert('No obvious title found at the top of content.');
+        }
+    };
+
     const handleLogout = () => signOut(auth);
 
     const openModal = (item?: VibeItem) => {
         if (item) {
             setEditingItem(item);
-            setForm(item);
+            setForm({
+                ...item,
+                name_ko: item.name_ko || '',
+                name_en: item.name_en || '',
+                description_ko: item.description_ko || '',
+                description_en: item.description_en || ''
+            });
         } else {
             setEditingItem(null);
             setForm({
-                name: '', category: activeTab !== 'Overview' && activeTab !== 'Admins' ? activeTab as any : 'Blog', description: '', linkUrl: '', imageUrl: ''
+                name: '',
+                name_ko: '',
+                name_en: '',
+                category: activeTab !== 'Overview' && activeTab !== 'Admins' ? activeTab as any : 'Blog',
+                description: '',
+                description_ko: '',
+                description_en: '',
+                linkUrl: '',
+                imageUrl: ''
             });
         }
         setFile(null);
@@ -247,7 +411,7 @@ const Admin = () => {
         }
     };
 
-    const handleInlineImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInlineImage = async (e: React.ChangeEvent<HTMLInputElement>, field: 'description' | 'description_ko' | 'description_en' = 'description') => {
         const selectedFile = e.target.files?.[0];
         if (!selectedFile) return;
         try {
@@ -255,24 +419,31 @@ const Admin = () => {
             const url = await compressAndUploadImage(selectedFile);
             const markdownImage = `\n![image](${url})\n`;
 
-            const textarea = document.getElementById('markdown-description') as HTMLTextAreaElement;
+            const elementId = field === 'description' ? 'markdown-description' : `markdown-${field}`;
+            const textarea = document.getElementById(elementId) as HTMLTextAreaElement;
+
             if (textarea) {
                 const start = textarea.selectionStart;
                 const end = textarea.selectionEnd;
-                const currentText = form.description || '';
+                const currentText = (form as any)[field] || '';
 
                 const before = currentText.substring(0, start);
                 const after = currentText.substring(end);
 
-                setForm(prev => ({ ...prev, description: before + markdownImage + after }));
-
-                // Focus back to textarea and move cursor after injected image
-                setTimeout(() => {
-                    textarea.focus();
-                    textarea.setSelectionRange(start + markdownImage.length, start + markdownImage.length);
-                }, 0);
+                // For Non-Blog content, still use markdown
+                if (form.category !== 'Blog') {
+                    setForm(prev => ({ ...prev, [field]: before + markdownImage + after }));
+                    setTimeout(() => {
+                        textarea.focus();
+                        textarea.setSelectionRange(start + markdownImage.length, start + markdownImage.length);
+                    }, 0);
+                }
+            } else if (form.category === 'Blog') {
+                // For Blog content (Quill), we insert an HTML <img> tag
+                const htmlImage = `<img src="${url}" alt="image" style="max-width:100%; border-radius:1rem;" />`;
+                setForm(prev => ({ ...prev, [field]: ((form as any)[field] || '') + htmlImage }));
             } else {
-                setForm(prev => ({ ...prev, description: (prev.description || '') + markdownImage }));
+                setForm(prev => ({ ...prev, [field]: ((form as any)[field] || '') + markdownImage }));
             }
         } catch (err) {
             console.error(err);
@@ -526,9 +697,36 @@ const Admin = () => {
                         </div>
 
                         <form onSubmit={handleSave} className="p-6 overflow-y-auto space-y-4">
-                            <div>
-                                <label className="block text-sm font-semibold mb-1">Name</label>
-                                <input required type="text" className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-primary/50" value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} />
+                            <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800 mb-2">
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Google Docs Import</label>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="Paste Google Doc URL or ID"
+                                        value={googleDocId}
+                                        onChange={e => setGoogleDocId(e.target.value)}
+                                        className="flex-1 px-3 py-2 bg-white dark:bg-slate-900 border dark:border-slate-700 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/50"
+                                    />
+                                    <div className="flex flex-col gap-1">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleImportGoogleDoc('ko')}
+                                            disabled={isImportingGDoc}
+                                            className="px-3 py-1 bg-primary text-white text-[10px] font-bold rounded-md hover:brightness-110 disabled:opacity-50 whitespace-nowrap"
+                                        >
+                                            Import to KO
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleImportGoogleDoc('en')}
+                                            disabled={isImportingGDoc}
+                                            className="px-3 py-1 bg-slate-700 text-white text-[10px] font-bold rounded-md hover:brightness-110 disabled:opacity-50 whitespace-nowrap"
+                                        >
+                                            Import to EN
+                                        </button>
+                                    </div>
+                                </div>
+                                {isImportingGDoc && <div className="mt-2 text-[10px] text-primary animate-pulse font-bold">Importing content and images...</div>}
                             </div>
 
                             <div>
@@ -542,17 +740,118 @@ const Admin = () => {
                                 </select>
                             </div>
 
-                            <div>
-                                <div className="flex items-center justify-between mb-1">
-                                    <label className="block text-sm font-semibold">Description (Markdown)</label>
-                                    <label className="text-xs font-bold text-primary hover:bg-primary/10 px-2 py-1 rounded cursor-pointer transition-colors flex items-center gap-1">
-                                        <ImageIcon size={14} />
-                                        {isUploadingInline ? 'Uploading...' : 'Insert Markdown Image'}
-                                        <input type="file" accept="image/*" onChange={handleInlineImage} className="hidden" disabled={isUploadingInline} />
-                                    </label>
-                                </div>
-                                <textarea id="markdown-description" className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-primary/50 h-32 font-mono text-sm" value={form.description || ''} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Type markdown here... You can embed images via the button above." />
-                            </div>
+                            {form.category === 'Blog' ? (
+                                <>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-semibold mb-1">Title (KO)</label>
+                                            <input required type="text" className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-primary/50" value={form.name_ko || ''} onChange={e => setForm({ ...form, name_ko: e.target.value, name: form.name || e.target.value })} />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-semibold mb-1">Title (EN)</label>
+                                            <input type="text" className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-primary/50" value={form.name_en || ''} onChange={e => setForm({ ...form, name_en: e.target.value })} />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div className="flex items-center justify-between mb-1">
+                                            <div className="flex items-center gap-2">
+                                                <label className="block text-sm font-semibold">Content (KO - Rich Text)</label>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => extractTitleFromContent('description_ko')}
+                                                    className="text-[10px] bg-primary/10 hover:bg-primary/20 text-primary px-2 py-0.5 rounded transition-colors font-bold"
+                                                >
+                                                    Title
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => stripTitleFromContent('description_ko')}
+                                                    className="text-[10px] bg-slate-100 dark:bg-slate-700 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-500 hover:text-red-500 px-2 py-0.5 rounded transition-colors font-bold"
+                                                >
+                                                    Strip Title
+                                                </button>
+                                            </div>
+                                            <label className="text-xs font-bold text-primary hover:bg-primary/10 px-2 py-1 rounded cursor-pointer transition-colors flex items-center gap-1">
+                                                <ImageIcon size={14} />
+                                                {isUploadingInline ? 'Uploading...' : 'Insert Photo'}
+                                                <input type="file" accept="image/*" onChange={(e) => handleInlineImage(e, 'description_ko')} className="hidden" disabled={isUploadingInline} />
+                                            </label>
+                                        </div>
+                                        <div className="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border dark:border-slate-700">
+                                            <ReactQuill
+                                                theme="snow"
+                                                value={form.description_ko || ''}
+                                                onChange={val => setForm({
+                                                    ...form,
+                                                    description_ko: val,
+                                                    // Ensure 'description' is also updated as HTML for Blog category
+                                                    description: val
+                                                })}
+                                                modules={quillModules}
+                                                formats={quillFormats}
+                                                className="blog-post-content h-64 mb-12"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div className="flex items-center justify-between mb-1">
+                                            <div className="flex items-center gap-2">
+                                                <label className="block text-sm font-semibold">Content (EN - Rich Text)</label>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => extractTitleFromContent('description_en')}
+                                                    className="text-[10px] bg-primary/10 hover:bg-primary/20 text-primary px-2 py-0.5 rounded transition-colors font-bold"
+                                                >
+                                                    Title
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => stripTitleFromContent('description_en')}
+                                                    className="text-[10px] bg-slate-100 dark:bg-slate-700 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-500 hover:text-red-500 px-2 py-0.5 rounded transition-colors font-bold"
+                                                >
+                                                    Strip Title
+                                                </button>
+                                            </div>
+                                            <label className="text-xs font-bold text-primary hover:bg-primary/10 px-2 py-1 rounded cursor-pointer transition-colors flex items-center gap-1">
+                                                <ImageIcon size={14} />
+                                                {isUploadingInline ? 'Uploading...' : 'Insert Photo'}
+                                                <input type="file" accept="image/*" onChange={(e) => handleInlineImage(e, 'description_en')} className="hidden" disabled={isUploadingInline} />
+                                            </label>
+                                        </div>
+                                        <div className="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border dark:border-slate-700">
+                                            <ReactQuill
+                                                theme="snow"
+                                                value={form.description_en || ''}
+                                                onChange={val => setForm({ ...form, description_en: val })}
+                                                modules={quillModules}
+                                                formats={quillFormats}
+                                                className="blog-post-content h-64 mb-12"
+                                            />
+                                        </div>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div>
+                                        <label className="block text-sm font-semibold mb-1">Name</label>
+                                        <input required type="text" className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-primary/50" value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} />
+                                    </div>
+
+                                    <div>
+                                        <div className="flex items-center justify-between mb-1">
+                                            <label className="block text-sm font-semibold">Description (Markdown)</label>
+                                            <label className="text-xs font-bold text-primary hover:bg-primary/10 px-2 py-1 rounded cursor-pointer transition-colors flex items-center gap-1">
+                                                <ImageIcon size={14} />
+                                                {isUploadingInline ? 'Uploading...' : 'Insert Markdown Image'}
+                                                <input type="file" accept="image/*" onChange={handleInlineImage} className="hidden" disabled={isUploadingInline} />
+                                            </label>
+                                        </div>
+                                        <textarea id="markdown-description" className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-primary/50 h-32 font-mono text-sm" value={form.description || ''} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Type markdown here..." />
+                                    </div>
+                                </>
+                            )}
 
                             <div>
                                 <label className="block text-sm font-semibold mb-1">Link URL (Optional)</label>

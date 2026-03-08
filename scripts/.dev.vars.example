@@ -1,0 +1,10 @@
+# Google Service Account Credentials
+# Get these from your Google Cloud Console Service Account JSON
+GOOGLE_SERVICE_ACCOUNT_EMAIL="your-service-account@your-project.iam.gserviceaccount.com"
+GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
+
+# Cloudflare R2 Configuration
+# Your R2 bucket name (must match the binding in wrangler.toml)
+BUCKET="bouncyhachi"
+# Your R2 Public URL (e.g., https://pub-xxxx.r2.dev)
+R2_PUBLIC_DOMAIN="https://pub-47a8242cca8645aaa67f3abeef516c23.r2.dev"

@@ -3,10 +3,13 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getItemById, type VibeItem } from '../lib/crud';
 import { marked } from 'marked';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+import 'react-quill-new/dist/quill.snow.css';
 
 const BlogPost = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { lang } = useLanguage();
     const [post, setPost] = useState<VibeItem | null>(null);
     const [loading, setLoading] = useState(true);
     const [htmlContent, setHtmlContent] = useState('');
@@ -17,9 +20,15 @@ const BlogPost = () => {
         getItemById(id).then(async (data) => {
             if (data && data.category === 'Blog') {
                 setPost(data);
-                // Parse markdown to HTML
-                const parsed = await marked.parse(data.description || '');
-                setHtmlContent(parsed);
+                // Select content based on language
+                const content = lang === 'ko' ? (data.description_ko || data.description) : (data.description_en || data.description);
+
+                // Determine if content is HTML (from Quill/Docs) or Markdown (legacy)
+                const isHtml = content?.trim().startsWith('<') || content?.includes('</');
+
+                // If it's HTML, we don't need marked. If it's Markdown, parse it.
+                const parsedContent = isHtml ? (content || '') : await marked.parse(content || '');
+                setHtmlContent(parsedContent);
             } else {
                 setPost(null);
             }
@@ -29,7 +38,7 @@ const BlogPost = () => {
         }).finally(() => {
             setLoading(false);
         });
-    }, [id]);
+    }, [id, lang]);
 
     if (loading) {
         return (
@@ -46,7 +55,7 @@ const BlogPost = () => {
                 <h1 className="text-3xl font-bold mb-4 dark:text-white">Article Not Found</h1>
                 <p className="text-slate-600 mb-8 max-w-md">The article you're looking for might have been removed, or the link is incorrect.</p>
                 <button
-                    onClick={() => navigate('/blog')}
+                    onClick={() => navigate(`/${lang}/blog`)}
                     className="px-6 py-3 bg-primary text-white font-bold rounded-lg hover:brightness-110 flex items-center gap-2"
                 >
                     <ArrowLeft size={18} /> Back to Blog
@@ -58,13 +67,15 @@ const BlogPost = () => {
     return (
         <article className="flex flex-col items-center justify-start py-12 md:py-24 px-4 w-full">
             <div className="w-full max-w-3xl">
-                <Link to="/blog" className="inline-flex items-center gap-2 text-slate-600 hover:text-primary transition-colors font-medium mb-8">
+                <Link to={`/${lang}/blog`} className="inline-flex items-center gap-2 text-slate-600 hover:text-primary transition-colors font-medium mb-8">
                     <ArrowLeft size={18} /> Back to all articles
                 </Link>
 
                 <header className="mb-10 md:mb-14">
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 tracking-tight dark:text-white leading-[1.15]">
-                        {post.name}
+                        {lang === 'ko'
+                            ? (post.name_ko || post.name)
+                            : (post.name_en || post.name_ko || post.name)}
                     </h1>
                     <div className="flex items-center gap-4 text-slate-600 font-medium">
                         <time dateTime={post.createdAt?.toDate().toISOString()}>
@@ -81,15 +92,7 @@ const BlogPost = () => {
 
 
                 <div
-                    className="prose prose-lg md:prose-xl dark:prose-invert max-w-none 
-                               prose-headings:text-slate-900 dark:prose-headings:text-white prose-headings:font-bold prose-headings:tracking-tight 
-                               prose-p:text-slate-800 dark:prose-p:text-slate-200 
-                               prose-strong:text-slate-900 dark:prose-strong:text-white 
-                               prose-li:text-slate-800 dark:prose-li:text-slate-200 
-                               prose-a:text-primary hover:prose-a:text-primary/80 
-                               prose-img:rounded-xl md:prose-img:rounded-2xl prose-img:shadow-sm prose-img:mx-auto prose-img:border prose-img:border-slate-200 dark:prose-img:border-slate-800
-                               prose-hr:border-slate-200 dark:prose-hr:border-slate-800
-                               prose-blockquote:text-slate-800 dark:prose-blockquote:text-slate-200 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:py-1 prose-blockquote:px-6 prose-blockquote:rounded-r-lg prose-blockquote:font-medium prose-blockquote:not-italic"
+                    className="blog-post-content ql-editor"
                     dangerouslySetInnerHTML={{ __html: htmlContent }}
                 />
 

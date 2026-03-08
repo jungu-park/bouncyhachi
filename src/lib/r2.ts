@@ -41,7 +41,8 @@ export const compressAndUploadImage = async (file: File): Promise<string> => {
             });
 
             await s3Client.send(command);
-            return `${r2PublicUrl}/${fileName}`;
+            const domain = r2PublicUrl?.startsWith('http') ? r2PublicUrl : `https://${r2PublicUrl}`;
+            return `${domain.replace(/\/$/, '')}/${fileName}`;
         }
 
         const options = {
@@ -69,7 +70,10 @@ export const compressAndUploadImage = async (file: File): Promise<string> => {
         await s3Client.send(command);
 
         // Return the public URL for the uploaded image
-        return `${r2PublicUrl}/${fileName}`;
+        // Ensure r2PublicUrl has protocol and no trailing slash
+        const domain = r2PublicUrl?.startsWith('http') ? r2PublicUrl : `https://${r2PublicUrl}`;
+        const finalUrl = `${domain.replace(/\/$/, '')}/${fileName}`;
+        return finalUrl;
     } catch (error) {
         console.error('Error compressing/uploading image to R2:', error);
         throw error;

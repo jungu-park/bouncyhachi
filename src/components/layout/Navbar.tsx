@@ -1,16 +1,24 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTheme } from '../../context/ThemeContext';
 import { Sun, Moon, Globe } from 'lucide-react';
 
 const Navbar = () => {
-    const { lang, t, toggleLang } = useLanguage();
+    const { lang, t } = useLanguage();
     const { theme, toggleTheme } = useTheme();
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const handleLanguageToggle = () => {
+        const newLang = lang === 'en' ? 'ko' : 'en';
+        const newPath = location.pathname.replace(/^\/(en|ko)/, `/${newLang}`);
+        navigate(newPath);
+    };
 
     return (
         <header className="sticky top-0 z-50 glass-effect transition-colors duration-300">
             <div className="container mx-auto px-4 h-20 flex items-center justify-between">
-                <Link to="/" className="flex items-center gap-2 group">
+                <Link to={`/${lang}`} className="flex items-center gap-2 group">
                     <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white neon-blue-glow font-black text-xl transform group-hover:rotate-12 transition-transform">
                         B
                     </div>
@@ -21,15 +29,15 @@ const Navbar = () => {
                 </Link>
 
                 <nav className="hidden md:flex items-center gap-8">
-                    <Link to="/blog" className="nav-link-bold">{t.nav.blog}</Link>
-                    <Link to="/tools" className="nav-link-bold hover:text-neon-pink">{t.nav.tools}</Link>
-                    <Link to="/arcade" className="nav-link-bold hover:text-green-500">{t.nav.games}</Link>
-                    <Link to="/fortune" className="nav-link-bold hover:text-purple-500">{t.nav.fortune}</Link>
+                    <Link to={`/${lang}/blog`} className="nav-link-bold">{t.nav.blog}</Link>
+                    <Link to={`/${lang}/tools`} className="nav-link-bold hover:text-neon-pink">{t.nav.tools}</Link>
+                    <Link to={`/${lang}/arcade`} className="nav-link-bold hover:text-green-500">{t.nav.games}</Link>
+                    <Link to={`/${lang}/fortune`} className="nav-link-bold hover:text-purple-500">{t.nav.fortune}</Link>
                 </nav>
 
                 <div className="flex items-center gap-4">
                     <button
-                        onClick={toggleLang}
+                        onClick={handleLanguageToggle}
                         className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white text-xs font-black hover:bg-slate-900 hover:text-white dark:hover:bg-slate-600 transition-all shadow-sm"
                     >
                         <Globe className="w-4 h-4" />
