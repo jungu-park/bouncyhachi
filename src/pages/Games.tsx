@@ -141,11 +141,14 @@ const Games = () => {
                         </button>
                     </div>
                     <div className="w-full md:w-64 h-48 rounded-2xl bg-slate-200 dark:bg-slate-800 flex items-center justify-center relative group overflow-hidden shadow-inner">
-                        {recommendedGame.imageUrl ? (
-                            <img src={recommendedGame.imageUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                        ) : (
-                            <Gamepad2 size={64} className="text-slate-400" />
-                        )}
+                        {(() => {
+                            const thumbUrl = (lang === 'en' && recommendedGame.imageUrl_en) ? recommendedGame.imageUrl_en : recommendedGame.imageUrl;
+                            return thumbUrl ? (
+                                <img src={thumbUrl} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={recommendedGame.name} />
+                            ) : (
+                                <Gamepad2 size={64} className="text-slate-400" />
+                            );
+                        })()}
                         <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors duration-300" />
                     </div>
                 </motion.section>
@@ -195,13 +198,16 @@ const Games = () => {
                                     className="vibe-item-card group bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-sm flex flex-col"
                                 >
                                     <div className="h-48 bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
-                                        {item.imageUrl ? (
-                                            <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600">
-                                                <Gamepad2 size={48} />
-                                            </div>
-                                        )}
+                                        {(() => {
+                                            const thumbUrl = (lang === 'en' && item.imageUrl_en) ? item.imageUrl_en : item.imageUrl;
+                                            return thumbUrl ? (
+                                                <img src={thumbUrl} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600">
+                                                    <Gamepad2 size={48} />
+                                                </div>
+                                            );
+                                        })()}
                                         <div className="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-green-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                         <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-transparent transition-colors duration-300" />
                                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-green-500 text-white rounded-full flex items-center justify-center pl-1 opacity-0 group-hover:opacity-100 transform scale-75 group-hover:scale-100 transition-all duration-300 shadow-lg shadow-green-500/50">

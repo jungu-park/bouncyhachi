@@ -11,6 +11,8 @@ export interface VibeItem {
     description_ko?: string;
     description_en?: string;
     imageUrl?: string;
+    imageUrl_ko?: string;
+    imageUrl_en?: string;
     linkUrl?: string; // For games or tools
     createdAt: Timestamp;
 }

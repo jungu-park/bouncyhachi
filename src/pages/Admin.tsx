@@ -55,6 +55,7 @@ const Admin = () => {
     const [editingItem, setEditingItem] = useState<VibeItem | null>(null);
     const [form, setForm] = useState<Partial<VibeItem>>({});
     const [file, setFile] = useState<File | null>(null);
+    const [fileEn, setFileEn] = useState<File | null>(null);
     const [saving, setSaving] = useState(false);
     const [isUploadingInline, setIsUploadingInline] = useState(false);
     const [isImportingDocx, setIsImportingDocx] = useState(false);
@@ -216,8 +217,10 @@ const Admin = () => {
                 description_ko: contentHtml,
                 description_en: '',
                 imageUrl: firstImageUrl,
+                imageUrl_en: '',
             });
             setFile(null);
+            setFileEn(null);
             setIsModalOpen(true);
 
         } catch (err) {
@@ -237,7 +240,7 @@ const Admin = () => {
             return;
         }
 
-        // Extract ID from URL if full URL is pasted
+        // Extract ID from URL if full URL is pasted, allowing backslashes typo handling
         if (docId.includes('docs.google.com/document/d/')) {
             const match = docId.match(/\/document\/d\/([a-zA-Z0-9_-]+)/);
             if (match && match[1]) {
@@ -245,10 +248,13 @@ const Admin = () => {
             }
         }
 
+        // Final sanity check for backslash typo (if user pasted directly without full url)
+        docId = docId.replace(/\\.*$/, '');
+
         try {
             setIsImportingGDoc(true);
-            // This is the URL of your deployed Cloudflare Worker
-            const WORKER_URL = import.meta.env.VITE_GDOCS_WORKER_URL || 'http://localhost:8787';
+            // This is the URL of your deployed Cloudflare Worker, or relative for local dev proxy
+            const WORKER_URL = import.meta.env.VITE_GDOCS_WORKER_URL || (import.meta.env.DEV ? '/api/gdocs' : 'http://localhost:8787');
 
 
             const response = await fetch(WORKER_URL, {
@@ -263,7 +269,7 @@ const Admin = () => {
                 throw new Error(data.error || 'Failed to import from Google Docs');
             }
 
-            let { html, title } = data;
+            let { html, title, firstImageUrl } = data;
 
             // Merging with existing form fields
             setForm(prev => ({
@@ -273,6 +279,7 @@ const Admin = () => {
                 // Also update generic fields for backward compatibility if they aren't set
                 name: prev.name || (lang === 'ko' ? title : prev.name),
                 description: lang === 'ko' ? html : prev.description,
+                imageUrl: prev.imageUrl || firstImageUrl,
                 category: prev.category || (activeTab !== 'Overview' && activeTab !== 'Admins' ? activeTab as any : 'Blog'),
             }));
 
@@ -360,10 +367,12 @@ const Admin = () => {
                 description_ko: '',
                 description_en: '',
                 linkUrl: '',
-                imageUrl: ''
+                imageUrl: '',
+                imageUrl_en: ''
             });
         }
         setFile(null);
+        setFileEn(null);
         setIsModalOpen(true);
     };
 
@@ -371,6 +380,7 @@ const Admin = () => {
         setIsModalOpen(false);
         setForm({});
         setFile(null);
+        setFileEn(null);
         setEditingItem(null);
     };
 
@@ -380,16 +390,23 @@ const Admin = () => {
         console.log('Starting handleSave...', { editingId: editingItem?.id, formName: form.name });
         try {
             let finalImageUrl = form.imageUrl;
+            let finalImageUrlEn = form.imageUrl_en;
 
             if (file) {
                 console.log('Uploading new thumbnail to R2...', file.name);
                 finalImageUrl = await compressAndUploadImage(file);
                 console.log('Thumbnail uploaded success:', finalImageUrl);
             }
+            if (fileEn) {
+                console.log('Uploading new EN thumbnail to R2...', fileEn.name);
+                finalImageUrlEn = await compressAndUploadImage(fileEn);
+                console.log('EN Thumbnail uploaded success:', finalImageUrlEn);
+            }
 
             const itemData: any = {
                 ...form,
                 imageUrl: finalImageUrl,
+                imageUrl_en: finalImageUrlEn,
             };
 
             if (editingItem?.id) {
@@ -858,13 +875,24 @@ const Admin = () => {
                                 <input type="text" placeholder="e.g., /tools/tax or https://..." className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-primary/50" value={form.linkUrl || ''} onChange={e => setForm({ ...form, linkUrl: e.target.value })} />
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-semibold mb-1">Thumbnail Image</label>
-                                {form.imageUrl && !file && (
-                                    <img src={form.imageUrl} className="h-24 object-cover rounded mb-2 border border-slate-200 dark:border-slate-700" alt="Current image" />
-                                )}
-                                <input type="file" accept="image/*" onChange={e => setFile(e.target.files?.[0] || null)} className="w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer" />
-                                {file && <span className="text-xs text-green-500 mt-1 block">New file selected: {file.name} (Will be compressed to Cloudflare R2)</span>}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-semibold mb-1">Thumbnail Image (KO / Default)</label>
+                                    {form.imageUrl && !file && (
+                                        <img src={form.imageUrl} className="h-24 object-cover rounded mb-2 border border-slate-200 dark:border-slate-700" alt="Current ko image" />
+                                    )}
+                                    <input type="file" accept="image/*" onChange={e => setFile(e.target.files?.[0] || null)} className="w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer" />
+                                    {file && <span className="text-xs text-green-500 mt-1 block">Selected: {file.name}</span>}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-semibold mb-1">Thumbnail Image (EN)</label>
+                                    {form.imageUrl_en && !fileEn && (
+                                        <img src={form.imageUrl_en} className="h-24 object-cover rounded mb-2 border border-slate-200 dark:border-slate-700" alt="Current en image" />
+                                    )}
+                                    <input type="file" accept="image/*" onChange={e => setFileEn(e.target.files?.[0] || null)} className="w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer" />
+                                    {fileEn && <span className="text-xs text-green-500 mt-1 block">Selected: {fileEn.name}</span>}
+                                </div>
                             </div>
 
                             <div className="pt-4 flex justify-end gap-3 border-t border-slate-200 dark:border-slate-800 mt-6">

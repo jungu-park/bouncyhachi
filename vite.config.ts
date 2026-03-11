@@ -1,12 +1,14 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import fs from 'fs'
 import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
+    nodePolyfills(),
     react(),
     tailwindcss(),
     {
@@ -66,6 +68,13 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
+    proxy: {
+      '/api/gdocs': {
+        target: 'http://127.0.0.1:8787',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/gdocs/, '')
+      }
+    }
   },
   envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
 })

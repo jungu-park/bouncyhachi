@@ -65,14 +65,14 @@ const BlogPost = () => {
     }
 
     return (
-        <article className="flex flex-col items-center justify-start py-12 md:py-24 px-4 w-full">
-            <div className="w-full max-w-3xl">
-                <Link to={`/${lang}/blog`} className="inline-flex items-center gap-2 text-slate-600 hover:text-primary transition-colors font-medium mb-8">
+        <article className="flex flex-col items-center justify-start py-12 md:py-20 px-4 md:px-0 w-full">
+            <div className="w-full max-w-[640px] mx-auto">
+                <Link to={`/${lang}/blog`} className="inline-flex items-center gap-2 text-slate-500 hover:text-primary transition-colors font-medium mb-10">
                     <ArrowLeft size={18} /> Back to all articles
                 </Link>
 
-                <header className="mb-10 md:mb-14">
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 tracking-tight dark:text-white leading-[1.15]">
+                <header className="mb-10 md:mb-16 w-full">
+                    <h1 className="text-3xl md:text-3xl lg:text-4xl font-black mb-6 tracking-tight dark:text-white leading-tight w-full break-words">
                         {lang === 'ko'
                             ? (post.name_ko || post.name)
                             : (post.name_en || post.name_ko || post.name)}
@@ -92,7 +92,7 @@ const BlogPost = () => {
 
 
                 <div
-                    className="blog-post-content ql-editor"
+                    className="blog-post-content ql-editor prose-container"
                     dangerouslySetInnerHTML={{ __html: htmlContent }}
                 />
 

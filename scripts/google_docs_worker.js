@@ -11,10 +11,33 @@ export default {
             return new Response(null, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
                     'Access-Control-Allow-Headers': 'Content-Type',
                 },
             });
+        }
+
+        const url = new URL(request.url);
+
+        // --- NEW: Proxy images from R2 ---
+        if (request.method === 'GET' && url.pathname.endsWith('/image')) {
+            const name = url.searchParams.get('name');
+            if (!name) return new Response('Missing name', { status: 400 });
+
+            console.log(`[Proxy] Fetching ${name} from R2...`);
+            const object = await env.BUCKET.get(name);
+            if (!object) {
+                console.error(`[Proxy] ${name} not found in BUCKET.`);
+                return new Response('Not Found', { status: 404, headers: { 'Access-Control-Allow-Origin': '*' } });
+            }
+
+            const headers = new Headers();
+            object.writeHttpMetadata(headers);
+            headers.set('Access-Control-Allow-Origin', '*');
+            headers.set('etag', object.httpEtag);
+            headers.set('Cache-Control', 'public, max-age=31536000');
+
+            return new Response(object.body, { headers });
         }
 
         if (request.method !== 'POST') {
@@ -46,13 +69,14 @@ export default {
 
             // 3. Process Images (Extract and Upload to R2)
             console.log('Starting image processing...');
-            const imageMap = await processImages(docJson, env, accessToken);
+            const workerOrigin = new URL(request.url).origin;
+            const { imageMap, firstImageUrl } = await processImages(docJson, env, accessToken, workerOrigin);
             console.log(`Image processing complete. Found ${imageMap.size} images.`);
 
             // 4. Convert to HTML with Styles
-            const html = convertGDocsToHtml(docJson, imageMap);
+            const { html } = convertGDocsToHtml(docJson, imageMap);
 
-            return new Response(JSON.stringify({ html, title: docJson.title }), {
+            return new Response(JSON.stringify({ html, title: docJson.title, firstImageUrl }), {
                 headers: {
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*',
@@ -122,15 +146,31 @@ async function getGoogleAccessToken(env) {
 /**
  * Image Processing: Fetch from Docs contentUri and upload to R2
  */
-async function processImages(docJson, env, accessToken) {
-    const { BUCKET, R2_PUBLIC_DOMAIN } = env;
+async function processImages(docJson, env, accessToken, workerOrigin) {
+    const { BUCKET } = env;
     const imageMap = new Map();
-    const inlineObjects = docJson.inlineObjects || {};
+    let firstImageUrl = null;
 
-    for (const [id, obj] of Object.entries(inlineObjects)) {
-        const contentUri = obj.inlineObjectProperties?.embeddedObject?.imageProperties?.contentUri;
+    const inlineObjects = docJson.inlineObjects || {};
+    const positionedObjects = docJson.positionedObjects || {};
+
+    // Combine both sets of objects to process all images
+    const allObjects = [
+        ...Object.entries(inlineObjects).map(([id, obj]) => ({ id, obj, type: 'inline' })),
+        ...Object.entries(positionedObjects).map(([id, obj]) => ({ id, obj, type: 'positioned' }))
+    ];
+
+    if (allObjects.length > 0) {
+        console.log(`[Image] Found ${allObjects.length} total objects to process.`);
+    }
+
+    for (const { id, obj, type } of allObjects) {
+        const contentUri = type === 'inline'
+            ? obj.inlineObjectProperties?.embeddedObject?.imageProperties?.contentUri
+            : obj.positionedObjectProperties?.embeddedObject?.imageProperties?.contentUri;
+
         if (contentUri) {
-            console.log(`[Image] Processing ${id}... Fetching from Google.`);
+            console.log(`[Image] Processing ${type} object ${id}...`);
             try {
                 // IMPORTANT: contentUri is a temporary signed URL. 
                 // DO NOT send Authorization header, it causes 401/403/404 errors.
@@ -141,7 +181,7 @@ async function processImages(docJson, env, accessToken) {
                 });
 
                 if (!imageRes.ok) {
-                    console.error(`[Image] ${id} fetch failed: ${imageRes.status} ${imageRes.statusText}`);
+                    console.error(`[Image] ${id} fetch failed: ${imageRes.status} ${imageRes.statusText}. URI: ${contentUri.substring(0, 100)}...`);
                     continue;
                 }
 
@@ -151,22 +191,25 @@ async function processImages(docJson, env, accessToken) {
                 const ext = rawExt.replace('jpeg', 'jpg'); // Normalize extension
                 const filename = `gdoc-${Date.now()}-${id}.${ext}`;
 
-                console.log(`[R2] Uploading ${id} to bucket as ${filename}... (${buffer.byteLength} bytes)`);
+                console.log(`[R2] Uploading ${id} to bucket as ${filename}... (${buffer.byteLength} bytes). Type: ${contentType}`);
                 await env.BUCKET.put(filename, buffer, {
                     httpMetadata: { contentType },
                 });
 
-                const domain = R2_PUBLIC_DOMAIN.startsWith('http') ? R2_PUBLIC_DOMAIN : `https://${R2_PUBLIC_DOMAIN}`;
-                const publicUrl = `${domain.replace(/\/$/, '')}/${filename}`;
-                console.log(`[R2] SUCCESS! Image ${id} available at: ${publicUrl}`);
+                // Use the worker's own origin for the image URL to ensure compatibility across environments
+                const publicUrl = `${workerOrigin.replace(/\/$/, '')}/image?name=${filename}`;
+                console.log(`[R2] SUCCESS for ${id}! URL: ${publicUrl}`);
                 imageMap.set(id, publicUrl);
+
+                if (!firstImageUrl) {
+                    firstImageUrl = publicUrl;
+                }
             } catch (err) {
-                console.error(`[Image] ERROR processing ${id}:`, err.message);
-                // Set a placeholder or just don't add to map so it fails gracefully
+                console.error(`[Image] CRITICAL ERROR for ${id}:`, err.message, err.stack);
             }
         }
     }
-    return imageMap;
+    return { imageMap, firstImageUrl };
 }
 
 /**
@@ -239,7 +282,7 @@ function convertGDocsToHtml(docJson, imageMap) {
             const paragraph = element.paragraph;
             const style = paragraph.paragraphStyle?.namedStyleType;
             const text = paragraph.elements.map(el => el.textRun?.content || '').join('').trim();
-            const hasImage = paragraph.elements.some(el => !!el.inlineObjectElement);
+            const hasImage = paragraph.elements.some(el => !!el.inlineObjectElement) || !!paragraph.positionedObjectIds;
 
             if (!text && !paragraph.bullet && !hasImage) continue;
 
@@ -262,6 +305,17 @@ function convertGDocsToHtml(docJson, imageMap) {
             const pAttr = pStyles ? ` style="${pStyles}"` : '';
 
             let innerHtml = '';
+
+            // Handle positioned objects (images placed around text)
+            if (paragraph.positionedObjectIds) {
+                for (const posId of paragraph.positionedObjectIds) {
+                    const r2Url = imageMap.get(posId);
+                    if (r2Url) {
+                        innerHtml += `<img src="${r2Url}" alt="Google Doc Image" />`;
+                    }
+                }
+            }
+
             for (const el of paragraph.elements) {
                 if (el.textRun) {
                     let content = el.textRun.content;
@@ -282,7 +336,7 @@ function convertGDocsToHtml(docJson, imageMap) {
                     const objId = el.inlineObjectElement.inlineObjectId;
                     const r2Url = imageMap.get(objId);
                     if (r2Url) {
-                        innerHtml += `<img src="${r2Url}" alt="Google Doc Image" style="max-width: 100%; height: auto; border-radius: 8px; margin: 10px 0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);" />`;
+                        innerHtml += `<img src="${r2Url}" alt="Google Doc Image" />`;
                     }
                 }
             }
@@ -299,7 +353,7 @@ function convertGDocsToHtml(docJson, imageMap) {
                 html += `<tr>`;
                 for (const cell of row.tableCells) {
                     html += `<td style="border: 1px solid #ddd; padding: 8px; vertical-align: top;">`;
-                    html += convertGDocsToHtml({ body: { content: cell.content }, lists }, imageMap);
+                    html += convertGDocsToHtml({ body: { content: cell.content }, lists }, imageMap).html;
                     html += `</td>`;
                 }
                 html += `</tr>`;
@@ -309,7 +363,7 @@ function convertGDocsToHtml(docJson, imageMap) {
     }
 
     closeAllLists();
-    return html;
+    return { html };
 }
 
 function getTextStyle(ts) {
@@ -320,8 +374,12 @@ function getTextStyle(ts) {
     if (ts.underline) styles.push('text-decoration: underline');
     if (ts.strikethrough) styles.push('text-decoration: line-through');
 
+    // Normalize font sizes: ignore if close to default (9-13pt) to allow theme to take over
     if (ts.fontSize) {
-        styles.push(`font-size: ${ts.fontSize.magnitude}${ts.fontSize.unit === 'PT' ? 'pt' : ts.fontSize.unit.toLowerCase()}`);
+        const size = ts.fontSize.magnitude;
+        if (size < 9 || size > 13) {
+            styles.push(`font-size: ${size}${ts.fontSize.unit === 'PT' ? 'pt' : ts.fontSize.unit.toLowerCase()}`);
+        }
     }
 
     if (ts.foregroundColor) {
@@ -344,12 +402,10 @@ function getParagraphStyles(ps) {
         const map = { 'START': 'left', 'CENTER': 'center', 'END': 'right', 'JUSTIFIED': 'justify' };
         styles.push(`text-align: ${map[ps.alignment] || 'left'}`);
     }
-    if (ps.lineSpacing) {
-        styles.push(`line-height: ${ps.lineSpacing / 100}`);
-    }
-    if (ps.indentStart) {
-        styles.push(`margin-left: ${ps.indentStart.magnitude}${ps.indentStart.unit === 'PT' ? 'pt' : 'px'}`);
-    }
+
+    // We intentionally ignore spacingMode, lineSpacing, and indents to keep the 
+    // blog post layout standardized and clean across all imports.
+
     return styles.join('; ');
 }
 
@@ -359,6 +415,13 @@ function parseColor(colorObj) {
     const r = Math.round((color.red || 0) * 255);
     const g = Math.round((color.green || 0) * 255);
     const b = Math.round((color.blue || 0) * 255);
+
+    // If text is pure black or very close to black, we ignore the color style
+    // so it can adapt to light/dark modes correctly.
+    if (r < 10 && g < 10 && b < 10) {
+        return null;
+    }
+
     return `rgb(${r}, ${g}, ${b})`;
 }
 

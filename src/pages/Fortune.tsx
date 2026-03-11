@@ -205,13 +205,16 @@ const Fortune = () => {
                                 <div className="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                                 <div className="h-48 bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
-                                    {item.imageUrl ? (
-                                        <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600">
-                                            <Wand2 size={48} />
-                                        </div>
-                                    )}
+                                    {(() => {
+                                        const thumbUrl = (lang === 'en' && item.imageUrl_en) ? item.imageUrl_en : item.imageUrl;
+                                        return thumbUrl ? (
+                                            <img src={thumbUrl} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600">
+                                                <Wand2 size={48} />
+                                            </div>
+                                        );
+                                    })()}
                                     <div className="absolute inset-0 bg-slate-900/40 group-hover:bg-transparent transition-colors duration-300" />
                                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                         <span className="px-4 py-2 bg-purple-500 text-white rounded-full text-sm font-bold shadow-lg shadow-purple-500/40">Start Reading</span>

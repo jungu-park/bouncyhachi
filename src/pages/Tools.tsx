@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import SEO from '../components/SEO';
 
 const Tools = () => {
-    const { t } = useLanguage();
+    const { t, lang } = useLanguage();
     const [items, setItems] = useState<VibeItem[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -107,13 +107,16 @@ const Tools = () => {
                                 className="vibe-item-card group bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-sm flex flex-col"
                             >
                                 <div className="h-48 bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
-                                    {item.imageUrl ? (
-                                        <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600">
-                                            <Wrench size={48} />
-                                        </div>
-                                    )}
+                                    {(() => {
+                                        const thumbUrl = (lang === 'en' && item.imageUrl_en) ? item.imageUrl_en : item.imageUrl;
+                                        return thumbUrl ? (
+                                            <img src={thumbUrl} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600">
+                                                <Wrench size={48} />
+                                            </div>
+                                        );
+                                    })()}
                                     {/* Pink top accent on hover */}
                                     <div className="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-pink-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                     <div className="absolute top-4 right-4 w-10 h-10 bg-white/90 dark:bg-slate-900/90 backdrop-blur rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: '#ff2e88' }}>
@@ -126,8 +129,10 @@ const Tools = () => {
                                         style={{}}
                                         onMouseEnter={e => (e.currentTarget.style.color = '#ff2e88')}
                                         onMouseLeave={e => (e.currentTarget.style.color = '')}
-                                    >{item.name}</h2>
-                                    <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-3 flex-1">{item.description}</p>
+                                    >{lang === 'ko' ? (item.name_ko || item.name) : (item.name_en || item.name)}</h2>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-3 flex-1">
+                                        {lang === 'ko' ? (item.description_ko || item.description) : (item.description_en || item.description)}
+                                    </p>
                                 </div>
                             </a>
                         ))}

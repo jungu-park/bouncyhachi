@@ -87,17 +87,20 @@ const Blog = () => {
                                 style={{ '--glow': 'rgba(6,127,249,0.35)' } as React.CSSProperties}
                             >
                                 <div className="aspect-[16/10] bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
-                                    {post.imageUrl ? (
-                                        <img
-                                            src={post.imageUrl}
-                                            alt={post.name}
-                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600">
-                                            <FileText size={48} className="opacity-50" />
-                                        </div>
-                                    )}
+                                    {(() => {
+                                        const thumbUrl = (lang === 'en' && post.imageUrl_en) ? post.imageUrl_en : post.imageUrl;
+                                        return thumbUrl ? (
+                                            <img
+                                                src={thumbUrl}
+                                                alt={post.name}
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600">
+                                                <FileText size={48} className="opacity-50" />
+                                            </div>
+                                        );
+                                    })()}
                                     {/* Blue top accent on hover */}
                                     <div className="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                 </div>

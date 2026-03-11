@@ -122,22 +122,45 @@
 
   /* ── Blog Post Content Style (Shared between Editor & Viewer) ── */
   .blog-post-content {
-    @apply prose prose-lg md:prose-xl dark:prose-invert max-w-none;
+    @apply prose prose-lg dark:prose-invert max-w-none;
+    width: 100%;
     @apply prose-headings:text-slate-900 dark:prose-headings:text-white prose-headings:font-bold prose-headings:tracking-tight;
     @apply prose-p:text-slate-800 dark:prose-p:text-slate-200;
     @apply prose-strong:text-slate-900 dark:prose-strong:text-white;
     @apply prose-li:text-slate-800 dark:prose-li:text-slate-200;
     @apply prose-a:text-primary hover:prose-a:text-primary/80;
-    @apply prose-img:rounded-xl md:prose-img:rounded-2xl prose-img:shadow-sm prose-img:mx-auto prose-img:border prose-img:border-slate-200 dark:prose-img:border-slate-800;
+    @apply prose-img:rounded-2xl prose-img:shadow-xl prose-img:mx-auto prose-img:my-12 prose-img:block prose-img:max-w-full md:prose-img:max-w-[100%] prose-img:border prose-img:border-slate-200/50 dark:prose-img:border-slate-800/50;
     @apply prose-hr:border-slate-200 dark:prose-hr:border-slate-800;
     @apply prose-blockquote:text-slate-800 dark:prose-blockquote:text-slate-200 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:py-1 prose-blockquote:px-6 prose-blockquote:rounded-r-lg prose-blockquote:font-medium prose-blockquote:not-italic;
   }
 
+  /* Explicit overrides for imported inline styles from Google Docs */
+  .blog-post-content h1,
+  .blog-post-content h2,
+  .blog-post-content h3 {
+    margin-top: 2.5rem !important;
+    margin-bottom: 1.25rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .blog-post-content p {
+    margin-bottom: 1.5rem !important;
+    line-height: 1.8 !important;
+  }
+
+  .blog-post-content img {
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
   /* Quill Editor Specific Overrides to match Home Page */
   .ql-editor.blog-post-content {
-    padding: 1.5rem 0; /* Match BlogPost container padding if needed */
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 0;
+    padding-bottom: 0;
     font-family: var(--font-display);
-    line-height: 1.75;
   }
 }
 
