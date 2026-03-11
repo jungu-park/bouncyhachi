@@ -154,8 +154,9 @@
     margin-right: auto !important;
   }
 
-  /* Quill Editor Specific Overrides to match Home Page */
-  .ql-editor.blog-post-content {
+  /* Quill Editor Specific Overrides - ensure zero padding for both Admin and Public Views */
+  .ql-editor.blog-post-content,
+  .blog-post-content .ql-editor {
     padding-left: 0 !important;
     padding-right: 0 !important;
     padding-top: 0;

@@ -707,7 +707,7 @@ const Admin = () => {
             {/* Modal */}
             {isModalOpen && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-                    <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh]">
+                    <div className={`w-full ${form.category === 'Blog' ? 'max-w-3xl' : 'max-w-lg'} bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh]`}>
                         <div className="flex justify-between items-center p-6 border-b border-slate-200 dark:border-slate-800">
                             <h3 className="text-lg font-bold">{editingItem ? 'Edit Item' : 'Add New Item'}</h3>
                             <button onClick={closeModal} className="text-slate-500 hover:text-slate-600 dark:hover:text-slate-200"><X size={20} /></button>
@@ -759,7 +759,7 @@ const Admin = () => {
 
                             {form.category === 'Blog' ? (
                                 <>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className={`grid grid-cols-2 gap-4 ${form.category === 'Blog' ? 'max-w-[640px] mx-auto' : ''}`}>
                                         <div>
                                             <label className="block text-sm font-semibold mb-1">Title (KO)</label>
                                             <input required type="text" className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-primary/50" value={form.name_ko || ''} onChange={e => setForm({ ...form, name_ko: e.target.value, name: form.name || e.target.value })} />
@@ -795,7 +795,7 @@ const Admin = () => {
                                                 <input type="file" accept="image/*" onChange={(e) => handleInlineImage(e, 'description_ko')} className="hidden" disabled={isUploadingInline} />
                                             </label>
                                         </div>
-                                        <div className="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border dark:border-slate-700">
+                                        <div className="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border dark:border-slate-700 prose-container max-w-[640px] mx-auto">
                                             <ReactQuill
                                                 theme="snow"
                                                 value={form.description_ko || ''}
@@ -837,7 +837,7 @@ const Admin = () => {
                                                 <input type="file" accept="image/*" onChange={(e) => handleInlineImage(e, 'description_en')} className="hidden" disabled={isUploadingInline} />
                                             </label>
                                         </div>
-                                        <div className="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border dark:border-slate-700">
+                                        <div className="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border dark:border-slate-700 prose-container max-w-[640px] mx-auto">
                                             <ReactQuill
                                                 theme="snow"
                                                 value={form.description_en || ''}
