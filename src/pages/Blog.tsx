@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { FileText, ArrowRight, Sparkles } from 'lucide-react';
 import { getItems, type VibeItem } from '../lib/crud';
@@ -15,6 +15,17 @@ const Blog = () => {
             setPosts(data.filter(item => item.category === 'Blog'));
         }).finally(() => setLoading(false));
     }, []);
+
+    const filteredPosts = useMemo(() => {
+        return posts.filter(post => {
+            if (lang === 'en') {
+                const hasTitle = post.name_en && post.name_en.trim() !== '';
+                const hasDesc = post.description_en && post.description_en.replace(/<[^>]*>/g, '').trim() !== '';
+                return !!(hasTitle && hasDesc);
+            }
+            return true;
+        });
+    }, [posts, lang]);
 
     return (
         <div className="flex flex-col items-center justify-start py-24 px-4 w-full">
@@ -72,14 +83,14 @@ const Blog = () => {
                         <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                         Loading posts...
                     </div>
-                ) : posts.length === 0 ? (
+                ) : filteredPosts.length === 0 ? (
                     <div className="p-12 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl text-center">
                         <Sparkles className="w-8 h-8 mx-auto mb-3 text-primary opacity-50" />
-                        <p className="text-slate-500 dark:text-slate-400 font-medium">Coming Soon</p>
+                        <p className="text-slate-500 dark:text-slate-400 font-medium">{t.cards.blog.desc === "인사이트 및 블로그 아티클" ? "게시글이 없습니다" : "No articles found"}</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {posts.map(post => (
+                        {filteredPosts.map(post => (
                             <Link
                                 to={`/${lang}/blog/${post.id}`}
                                 key={post.id}
