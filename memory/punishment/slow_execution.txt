@@ -1,0 +1,1 @@
+AI Lesson: Avoid heavy regex node -e execution to prevent shell hangs.

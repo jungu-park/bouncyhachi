@@ -196,8 +196,11 @@ async function processImages(docJson, env, accessToken, workerOrigin) {
                     httpMetadata: { contentType },
                 });
 
-                // Use the worker's own origin for the image URL to ensure compatibility across environments
-                const publicUrl = `${workerOrigin.replace(/\/$/, '')}/image?name=${filename}`;
+                // Use R2 public URL if available (env.R2_PUBLIC_URL), otherwise fall back to worker proxy
+                const r2PublicBase = env.R2_PUBLIC_URL ? env.R2_PUBLIC_URL.replace(/\/$/, '') : null;
+                const publicUrl = r2PublicBase
+                    ? `${r2PublicBase}/${filename}`
+                    : `${workerOrigin.replace(/\/$/, '')}/image?name=${filename}`;
                 console.log(`[R2] SUCCESS for ${id}! URL: ${publicUrl}`);
                 imageMap.set(id, publicUrl);
 
