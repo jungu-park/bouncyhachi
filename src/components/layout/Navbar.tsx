@@ -23,8 +23,8 @@ const Navbar = () => {
                         B
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-black text-xl tracking-tighter leading-none text-slate-900 dark:text-white group-hover:text-primary transition-colors">BOUNCY</span>
-                        <span className="font-bold text-sm tracking-[0.2em] leading-none text-neon-pink dark:text-neon-pink opacity-80 group-hover:opacity-100 transition-opacity">HACHI</span>
+                        <span className="font-black text-xl tracking-tighter leading-none text-slate-900 dark:text-white group-hover:text-primary transition-colors">{t.logo.title}</span>
+                        <span className="font-bold text-sm tracking-[0.2em] leading-none text-neon-pink dark:text-neon-pink opacity-80 group-hover:opacity-100 transition-opacity">{t.logo.sub}</span>
                     </div>
                 </Link>
 

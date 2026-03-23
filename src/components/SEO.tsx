@@ -24,6 +24,7 @@ export default function SEO({ title, description, type = 'website', name = 'Boun
             {/* Standard metadata tags */}
             <title>{title}</title>
             <meta name="description" content={description} />
+            <link rel="canonical" href={`${BASE_URL}${location.pathname}`} />
 
             {/* SEO: Localization (hreflang) */}
             {LANGUAGES.map((lang) => (

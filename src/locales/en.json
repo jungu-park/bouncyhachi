@@ -1,4 +1,8 @@
 {
+  "logo": {
+    "title": "BOUNCY",
+    "sub": "HACHI"
+  },
   "nav": {
     "home": "Home",
     "blog": "Vibe Log",

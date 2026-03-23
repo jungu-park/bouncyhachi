@@ -86,7 +86,9 @@ const Blog = () => {
                 ) : filteredPosts.length === 0 ? (
                     <div className="p-12 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl text-center">
                         <Sparkles className="w-8 h-8 mx-auto mb-3 text-primary opacity-50" />
-                        <p className="text-slate-500 dark:text-slate-400 font-medium">{t.cards.blog.desc === "인사이트 및 블로그 아티클" ? "게시글이 없습니다" : "No articles found"}</p>
+                        <p className="text-slate-500 dark:text-slate-400 font-medium">
+                            {lang === 'ko' ? "게시글이 없습니다" : "No articles found"}
+                        </p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
